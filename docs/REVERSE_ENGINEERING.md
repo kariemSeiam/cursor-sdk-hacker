@@ -4,7 +4,7 @@
 
 ## Overview
 
-The Cursor SDK (`@cursor/sdk@1.0.7`) is a TypeScript library that provides programmatic access to Cursor's AI coding agent. This report documents the reverse engineering of its internal architecture, authentication system, and API protocols.
+The Cursor SDK (`@cursor/sdk@1.0.9`) is a TypeScript library that provides programmatic access to Cursor's AI coding agent. This report documents the reverse engineering of its internal architecture, authentication system, and API protocols.
 
 ## Bundle Analysis
 

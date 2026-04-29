@@ -3,3 +3,12 @@ node_modules/
 *.log
 .cursor/
 .DS_Store
+
+# Temp CLI scripts (generated at runtime)
+.tmp-cli/
+
+# API key (never commit this)
+.cursor-api-key
+
+# Cache
+.cache/

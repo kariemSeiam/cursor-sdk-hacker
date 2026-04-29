@@ -13,15 +13,17 @@ import { homedir } from 'os';
 // ─── Config ───────────────────────────────────────────────
 const API2 = 'https://api2.cursor.sh';
 const REST = 'https://api.cursor.com';
-const KEY_FILE = '/root/.cursor-api-key';
+const KEY_FILE = process.env.CURSOR_KEY_FILE || `${homedir()}/.cursor-api-key`;
 const VERSION = '2.0.0-venom';
 
 // ─── Auth ─────────────────────────────────────────────────
 let cachedToken = null;
-let tokenFile = '/tmp/.cursor_jwt_cache';
+let tokenFile = `${homedir()}/.cache/cursor-jwt-cache.json`;
 
 function getApiKey() {
-  return readFileSync(KEY_FILE, 'utf8').trim();
+  if (process.env.CURSOR_API_KEY) return process.env.CURSOR_API_KEY;
+  if (existsSync(KEY_FILE)) return readFileSync(KEY_FILE, 'utf8').trim();
+  throw new Error('No API key. Set CURSOR_API_KEY or save to ' + KEY_FILE);
 }
 
 function loadCachedToken() {
@@ -50,7 +52,7 @@ function getToken() {
   const key = getApiKey();
   const result = execSync(
     `curl -s -X POST "${API2}/auth/exchange_user_api_key" ` +
-    `-H "Authorization: Bearer *** ` +
+    `-H "Authorization: Bearer ${key}" ` +
     `-H "Content-Type: application/json" ` +
     `-H "x-cursor-client-type: sdk" ` +
     `-d '{}'`,
@@ -71,7 +73,7 @@ function rpc(service, method, body = {}) {
   const jsonBody = typeof body === 'string' ? body : JSON.stringify(body);
   const result = execSync(
     `curl -s -X POST "${url}" ` +
-    `-H "Authorization: Bearer *** ` +
+    `-H "Authorization: Bearer ${token}" ` +
     `-H "Content-Type: application/json" ` +
     `-H "Connect-Protocol-Version: 1" ` +
     `-H "x-cursor-client-type: sdk" ` +
@@ -90,7 +92,7 @@ function rpcStream(service, method, body = {}) {
   const jsonBody = typeof body === 'string' ? body : JSON.stringify(body);
   return execSync(
     `curl -s -N -X POST "${url}" ` +
-    `-H "Authorization: Bearer *** ` +
+    `-H "Authorization: Bearer ${token}" ` +
     `-H "Content-Type: application/json" ` +
     `-H "Connect-Protocol-Version: 1" ` +
     `-H "x-cursor-client-type: sdk" ` +
@@ -106,7 +108,7 @@ function rpcStream(service, method, body = {}) {
 function restApi(path, method = 'GET', body = null) {
   const token = getToken();
   let cmd = `curl -s -X ${method} "${REST}${path}" ` +
-    `-H "Authorization: Bearer *** ` +
+    `-H "Authorization: Bearer ${token}" ` +
     `-H "Content-Type: application/json" ` +
     `-H "x-cursor-client-type: sdk" ` +
     `-H "x-ghost-mode: true" ` +
@@ -220,7 +222,7 @@ ${'─'.repeat(50)}
 
 👤 Profile:
    User ID: ${user.userID}
-   Email: kariemseiam@gmail.com
+   Email: ${user.email || '(not exposed)'}
    Country: ${user.country}
    IP: ${user.ip}
 
@@ -393,7 +395,7 @@ function cmdAsk(prompt, model) {
   const token = getToken();
   const result = execSync(
     `curl -s -X POST "${REST}/v1/chat/completions" ` +
-    `-H "Authorization: Bearer *** ` +
+    `-H "Authorization: Bearer ${token}" ` +
     `-H "Content-Type: application/json" ` +
     `-H "x-cursor-client-type: sdk" ` +
     `-H "x-ghost-mode: true" ` +
@@ -418,7 +420,7 @@ function cmdStream(prompt, model) {
   const token = getToken();
   execSync(
     `curl -s -N -X POST "${REST}/v1/chat/completions" ` +
-    `-H "Authorization: Bearer *** ` +
+    `-H "Authorization: Bearer ${token}" ` +
     `-H "Content-Type: application/json" ` +
     `-H "x-cursor-client-type: sdk" ` +
     `-H "x-ghost-mode: true" ` +

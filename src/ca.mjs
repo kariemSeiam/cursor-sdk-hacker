@@ -1,17 +1,28 @@
 #!/usr/bin/env node
 /**
- * 🐙 CURSOR AGENT CLI — by VENOM
- * Uses @cursor/sdk locally (composer-2-fast) + REST API (api.cursor.com)
+ * ca — Cursor Agent CLI (VENOM Edition) 🐙
+ * Local SDK execution (composer-2) + REST API (api.cursor.com)
+ *
+ * Model system (SDK v1.0.9+):
+ *   Models use parameters, not separate IDs.
+ *   composer-2-fast is now composer-2 with { fast: "true" }
+ *   Default variant for composer-2 is fast=true.
  */
 
 import { readFileSync, existsSync, mkdirSync, unlinkSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { execFile } from "node:child_process";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = join(__dirname, "..");
 const BASE_URL = process.env.CURSOR_BACKEND_URL || "https://api.cursor.com";
-const MODEL = process.env.CURSOR_MODEL || "composer-2-fast";
-const KEYFILE = "/root/.cursor-api-key";
-const SDK_DIR = "/home/kariem/cookbook/sdk/quickstart";
+const KEYFILE = process.env.CURSOR_KEY_FILE || (process.env.HOME || "/home/pigo") + "/.cursor-api-key";
+const VERSION = "1.1.0";
+
+// Default model + params. composer-2 defaults to fast=true when no params given.
+const DEFAULT_MODEL = "composer-2";
+const DEFAULT_PARAMS = {};  // empty = use SDK defaults (fast=true for composer-2)
 
 const c = {
   r: "\x1b[0m", bold: "\x1b[1m", dim: "\x1b[2m",
@@ -32,6 +43,28 @@ function getKey() {
 
 function enc(s) { return encodeURIComponent(s); }
 
+function parseModelArg(str) {
+  if (!str) return { id: DEFAULT_MODEL, parameters: DEFAULT_PARAMS };
+  // Support "model-id" or "model-id:param1=val1,param2=val2"
+  const [id, paramsStr] = str.split(":");
+  const parameters = {};
+  if (paramsStr) {
+    for (const pair of paramsStr.split(",")) {
+      const [k, v] = pair.split("=");
+      if (k && v) parameters[k] = v;
+    }
+  }
+  return { id, parameters };
+}
+
+function modelLabel(m) {
+  const parts = [m.id];
+  if (m.parameters && Object.keys(m.parameters).length > 0) {
+    parts.push(Object.entries(m.parameters).map(([k,v]) => `${k}=${v}`).join(","));
+  }
+  return parts.join(" ");
+}
+
 // ─── REST API (cloud) ──────────────
 
 async function restApi(method, path, body = null) {
@@ -48,25 +81,39 @@ async function restApi(method, path, body = null) {
 
 // ─── Local SDK (composer) ─────────
 
-function localAsk(prompt, cwd) {
-  const tmpDir = join(SDK_DIR, ".tmp-cli");
+function localAsk(prompt, cwd, model) {
+  const tmpDir = join(REPO_ROOT, ".tmp-cli");
   if (!existsSync(tmpDir)) mkdirSync(tmpDir, { recursive: true });
-  const safeCwd = (cwd || process.cwd()).replace(/"/g, '\\"');
+  // Escape for embedding in template literal: backslash, backtick, ${, "
+  const safeCwd = (cwd || process.cwd())
+    .replace(/\\/g, "\\\\")
+    .replace(/`/g, "\\`")
+    .replace(/\$/g, "\\$")
+    .replace(/"/g, '\\"');
 
   const apiKey = getKey();
+  const modelJson = JSON.stringify(model);
   const script = `import { Agent } from "@cursor/sdk";
 async function main() {
   const agent = await Agent.create({
     apiKey: "${apiKey}",
     name: "VENOM CLI",
-    model: { id: "${MODEL}" },
+    model: ${modelJson},
     local: { cwd: "${safeCwd}" }
   });
   const run = await agent.send(${JSON.stringify(prompt)});
   for await (const event of run.stream()) {
-    if (event.type !== "assistant") continue;
-    for (const block of event.message.content) {
-      if (block.type === "text") process.stdout.write(JSON.stringify({t:"d",d:block.text})+"\\n");
+    if (event.type === "assistant") {
+      for (const block of event.message.content) {
+        if (block.type === "text") process.stdout.write(JSON.stringify({t:"d",d:block.text})+"\\n");
+      }
+    } else if (event.type === "thinking") {
+      const text = event.message?.content?.[0]?.text || "";
+      if (text) process.stdout.write(JSON.stringify({t:"think",d:text})+"\\n");
+    } else if (event.type === "tool_use") {
+      process.stdout.write(JSON.stringify({t:"tool",n:event.name||"?",s:"start"})+"\\n");
+    } else if (event.type === "tool_result") {
+      process.stdout.write(JSON.stringify({t:"tool",n:event.name||"?",s:"done"})+"\\n");
     }
   }
   await run.wait();
@@ -80,7 +127,7 @@ main().catch(e => { process.stdout.write(JSON.stringify({t:"err",m:e.message})+"
   return new Promise((resolve, reject) => {
     const env = { ...process.env, CURSOR_API_KEY: getKey() };
     const child = execFile("npx", ["tsx", scriptPath], {
-      cwd: SDK_DIR, env, timeout: 180000, maxBuffer: 10 * 1024 * 1024,
+      cwd: REPO_ROOT, env, timeout: 180000, maxBuffer: 10 * 1024 * 1024,
     }, (error, stdout, stderr) => {
       try { unlinkSync(scriptPath); } catch {};
       if (error && !stdout) { reject(error); return; }
@@ -89,6 +136,19 @@ main().catch(e => { process.stdout.write(JSON.stringify({t:"err",m:e.message})+"
         try { const e = JSON.parse(line); if (e.t === "d") text += e.d; } catch {}
       }
       resolve({ text, raw: stdout, stderr });
+    });
+
+    // Graceful Ctrl+C: kill child, clean up temp file
+    const cleanup = () => {
+      try { child.kill("SIGTERM"); } catch {}
+      try { unlinkSync(scriptPath); } catch {}
+      process.exit(130);
+    };
+    process.on("SIGINT", cleanup);
+    process.on("SIGTERM", cleanup);
+    child.on("exit", () => {
+      process.removeListener("SIGINT", cleanup);
+      process.removeListener("SIGTERM", cleanup);
     });
 
     let buffer = "";
@@ -101,8 +161,8 @@ main().catch(e => { process.stdout.write(JSON.stringify({t:"err",m:e.message})+"
           const evt = JSON.parse(line);
           if (evt.t === "d") process.stdout.write(evt.d);
           else if (evt.t === "think") process.stdout.write(`${c.dim}${evt.d}${c.r}`);
-          else if (evt.t === "tool") log(`\n  ${c.yel}⟳${c.r} ${c.bold}${evt.n}${c.r}`);
-          else if (evt.t === "done") log(`  ${c.grn}✔${c.r} ${evt.n}`);
+          else if (evt.t === "tool" && evt.s === "start") log(`\n  ${c.yel}⟳${c.r} ${c.bold}${evt.n}${c.r}`);
+          else if (evt.t === "tool" && evt.s === "done") log(`  ${c.grn}✔${c.r} ${evt.n}`);
           else if (evt.t === "end") log("");
           else if (evt.t === "err") fail(evt.m);
         } catch { process.stdout.write(line); }
@@ -120,21 +180,21 @@ main().catch(e => { process.stdout.write(JSON.stringify({t:"err",m:e.message})+"
 
 // ─── Commands ──────────────────────
 
-async function cmdAsk(args) {
+async function cmdAsk(args, model) {
   const text = args.join(" ");
   if (!text) fail("Usage: ca ask <your question>");
-  octo(`Model: ${c.bold}${MODEL}${c.r} | CWD: ${process.cwd()}`);
+  octo(`Model: ${c.bold}${modelLabel(model)}${c.r} | CWD: ${process.cwd()}`);
   octo(`Asking: "${text.slice(0, 80)}${text.length > 80 ? "..." : ""}"\n`);
-  await localAsk(text);
+  await localAsk(text, undefined, model);
 }
 
-async function cmdCode(args) {
+async function cmdCode(args, model) {
   const text = args.join(" ");
   if (!text) fail("Usage: ca code <task description>");
   const cwd = process.cwd();
-  octo(`Model: ${c.bold}${MODEL}${c.r} | CWD: ${cwd}`);
+  octo(`Model: ${c.bold}${modelLabel(model)}${c.r} | CWD: ${cwd}`);
   octo(`Task: "${text.slice(0, 80)}${text.length > 80 ? "..." : ""}"\n`);
-  await localAsk(text, cwd);
+  await localAsk(text, cwd, model);
 }
 
 async function cmdMe() {
@@ -154,9 +214,10 @@ async function cmdModels() {
     log(`\n  Total: ${d.items.length}`);
   }
   log(`\n${c.bold}Local Models (SDK):${c.r}`);
-  log(`  ${c.grn}●${c.r} ${c.bold}composer-2${c.r} ${c.dim}(default)${c.r}`);
-  log(`  ${c.grn}●${c.r} ${c.bold}composer-2-fast${c.r} ${c.dim}(faster)${c.r}`);
+  log(`  ${c.grn}●${c.r} ${c.bold}composer-2${c.r} ${c.dim}(default, fast=true)${c.r}`);
+  log(`  ${c.grn}●${c.r} ${c.bold}composer-2:fast=false${c.r} ${c.dim}(more thorough)${c.r}`);
   log(`  ${c.grn}●${c.r} ${c.bold}composer-1.5${c.r} ${c.dim}(legacy)${c.r}`);
+  log(`\n${c.dim}Tip: use --model composer-2:fast=false for thorough mode${c.r}`);
 }
 
 async function cmdRepos() {
@@ -179,12 +240,12 @@ async function cmdAgents(args) {
   } else log("  No agents found.");
 }
 
-async function cmdPrompt(args) {
+async function cmdPrompt(args, model) {
   const text = args.join(" ");
   if (!text) fail("Usage: ca prompt <text>");
-  octo(`Cloud prompt [${MODEL}]...`);
+  octo(`Cloud prompt [${modelLabel(model)}]...`);
   const res = await restApi("POST", "/v1/agents", {
-    prompt: { text }, model: { id: MODEL },
+    prompt: { text }, model: { id: model.id },
   });
   const agentId = res.agent?.id, runId = res.run?.id;
   if (!agentId || !runId) fail("Failed: " + JSON.stringify(res));
@@ -269,13 +330,13 @@ async function cmdRaw(args) {
 
 function help() {
   log(`
-${c.mag}🐙 CURSOR AGENT CLI${c.r} ${c.dim}by VENOM${c.r}
+${c.mag}🐙 CURSOR AGENT CLI${c.r} ${c.dim}v${VERSION} by VENOM${c.r}
 
-${c.bold}Local (composer-2-fast):${c.r}
+${c.bold}Local (SDK — runs on your machine):${c.r}
   ${c.cyn}ask${c.r} <question>              Ask composer a question
   ${c.cyn}code${c.r} <task>                 Give composer a coding task
 
-${c.bold}Cloud (REST API):${c.r}
+${c.bold}Cloud (REST API — runs in Cursor's VMs):${c.r}
   ${c.cyn}me${c.r}                          Account info
   ${c.cyn}models${c.r}                      List all models
   ${c.cyn}repos${c.r}                       List repos
@@ -286,31 +347,81 @@ ${c.bold}Cloud (REST API):${c.r}
   ${c.cyn}delete${c.r} <agentId>            Delete agent
   ${c.cyn}raw${c.r} <M> <path> [body]       Raw API call
 
+${c.bold}Flags:${c.r}
+  ${c.cyn}--model${c.r} <id[:params]>       Override model (default: ${DEFAULT_MODEL})
+                                   Examples: composer-2:fast=false
+                                             claude-opus-4-7:reasoning=high
+  ${c.cyn}--version${c.r}                   Show version
+  ${c.cyn}--help${c.r}, ${c.cyn}-h${c.r}                    This help
+
 ${c.bold}Config:${c.r}
-  CURSOR_API_KEY    API key (or saved in ${KEYFILE})
-  CURSOR_MODEL      Model (default: composer-2-fast)
+  CURSOR_API_KEY       API key (or saved in ${KEYFILE})
+  CURSOR_MODEL         Model override (same as --model)
+  CURSOR_KEY_FILE      Custom key file path
+  CURSOR_BACKEND_URL   Custom REST API base URL
 
 ${c.dim}Examples:${c.r}
   ${c.dim}ca ask "what is 2+2?"${c.r}
   ${c.dim}ca code "create a hello.py file"${c.r}
+  ${c.dim}ca code "refactor auth" --model composer-2:fast=false${c.r}
   ${c.dim}ca models${c.r}
   ${c.dim}ca raw GET /v1/models${c.r}
+  ${c.dim}ca --version${c.r}
 `);
 }
 
 // ─── Main ──────────────────────────
-const [,, cmd, ...args] = process.argv;
-const cmds = {
-  ask: cmdAsk, code: cmdCode,
-  me: cmdMe, models: cmdModels, repos: cmdRepos,
-  agents: cmdAgents, prompt: cmdPrompt, runs: cmdRuns,
-  stream: cmdStream, delete: cmdDelete, raw: cmdRaw,
-};
 
-if (!cmd || cmd === "help" || cmd === "-h") { help(); process.exit(0); }
+function main() {
+  const argv = process.argv.slice(2);
 
-(async () => {
+  // --version
+  if (argv[0] === "--version" || argv[0] === "-v") {
+    log(`ca v${VERSION}`);
+    process.exit(0);
+  }
+
+  // --help
+  if (!argv[0] || argv[0] === "help" || argv[0] === "--help" || argv[0] === "-h") {
+    help();
+    process.exit(0);
+  }
+
+  // Parse --model flag (can appear before or after command)
+  let modelOverride = null;
+  const args = [];
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === "--model" && argv[i + 1]) {
+      modelOverride = argv[++i];
+    } else {
+      args.push(argv[i]);
+    }
+  }
+
+  const model = parseModelArg(modelOverride || process.env.CURSOR_MODEL || null);
+  const cmd = args[0];
+  const rest = args.slice(1);
+
+  const cmds = {
+    ask: () => cmdAsk(rest, model),
+    code: () => cmdCode(rest, model),
+    me: cmdMe,
+    models: cmdModels,
+    repos: cmdRepos,
+    agents: () => cmdAgents(rest),
+    prompt: () => cmdPrompt(rest, model),
+    runs: () => cmdRuns(rest),
+    stream: () => cmdStream(rest),
+    delete: () => cmdDelete(rest),
+    raw: () => cmdRaw(rest),
+  };
+
   const fn = cmds[cmd];
-  if (!fn) { fail(`Unknown: ${cmd}\nRun 'ca help' for commands`); }
-  try { await fn(args); } catch (e) { fail(e.message); }
-})();
+  if (!fn) fail(`Unknown: ${cmd}\nRun 'ca help' for commands`);
+
+  (async () => {
+    try { await fn(); } catch (e) { fail(e.message); }
+  })();
+}
+
+main();

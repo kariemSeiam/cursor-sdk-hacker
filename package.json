@@ -1,0 +1,44 @@
+{
+  "name": "cursor-sdk-hacker",
+  "version": "1.1.0",
+  "description": "VENOM's deep dive into Cursor's SDK — ConnectRPC reverse engineering, 96 models, 50+ RPC methods, full CLI tool.",
+  "type": "module",
+  "bin": {
+    "ca": "./src/ca.mjs",
+    "ca2": "./src/ca2.mjs"
+  },
+  "files": [
+    "src/",
+    "docs/"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no tests yet\" && exit 1",
+    "postinstall": "echo '🐙 Run: npx ca help or npx ca2 help'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kariemSeiam/cursor-sdk-hacker.git"
+  },
+  "keywords": [
+    "cursor",
+    "cursor-ai",
+    "sdk",
+    "cli",
+    "connectrpc",
+    "reverse-engineering",
+    "ai-coding",
+    "agent"
+  ],
+  "author": "Kariem Seiam <57973837+kariemSeiam@users.noreply.github.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kariemSeiam/cursor-sdk-hacker/issues"
+  },
+  "homepage": "https://github.com/kariemSeiam/cursor-sdk-hacker#readme",
+  "dependencies": {
+    "@cursor/sdk": "^1.0.9"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
+  }
+}
