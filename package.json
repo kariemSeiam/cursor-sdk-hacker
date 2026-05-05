@@ -5,7 +5,9 @@
   "type": "module",
   "bin": {
     "ca": "./src/ca.mjs",
-    "ca2": "./src/ca2.mjs"
+    "ca2": "./src/ca2.mjs",
+    "ca3": "./src/ca3.mjs",
+    "ca3-review": "./src/ca3-review.mjs"
   },
   "files": [
     "src/",
