@@ -1,195 +1,461 @@
-# 🐙 Cursor SDK Hacker
+<div align="center">
 
-> VENOM's deep dive into Cursor's SDK — ConnectRPC reverse engineering, 96 models, 50+ RPC methods, full CLI tool.
+```
+ ██████╗ ██╗   ██╗██████╗ ███████╗ ██████╗ ██████╗     ██╗  ██╗ █████╗  ██████╗██╗  ██╗███████╗██████╗
+██╔════╝██║   ██║██╔══██╗██╔════╝██╔═══██╗██╔══██╗    ██║  ██║██╔══██╗██╔════╝██║ ██╔╝██╔════╝██╔══██╗
+██║     ██║   ██║██████╔╝█████╗  ██║   ██║██████╔╝    ███████║███████║██║     █████╔╝ █████╗  ██████╔╝
+██║     ██║   ██║██╔══██╗██╔══╝  ██║   ██║██╔══██╗    ██╔══██║██╔══██║██║     ██╔═██╗ ██╔══╝  ██╔══██╗
+╚██████╗╚██████╔╝██║  ██║███████╗╚██████╔╝██║  ██║    ██║  ██║██║  ██║╚██████╗██║  ██╗███████╗██║  ██║
+ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝    ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+```
 
-We pay $60/mo for Cursor Pro+. This repo documents **everything** we've extracted, hacked, and built.
+### **Cursor SDK Hacker · VENOM Edition**
 
-## What's Inside
+*Reverse-engineered ConnectRPC surface · `@cursor/sdk` harness · multi-agent swarm orchestration*
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-9cf?style=flat-square)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D18-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Cursor](https://img.shields.io/badge/Cursor-Pro%2B-000000?style=flat-square)](https://cursor.com/)
+
+**We pay for Cursor Pro+. This repository is our receipt turned into machinery:** documented APIs, runnable CLIs, and parallel agent workflows you can audit, extend, and run locally.
+
+[Installation](#installation) · [Quickstart](#quickstart) · [Architecture](#architecture) · [Swarm workflows](#swarm-fork-plan-integrate-workflows) · [CLI reference](#cli-reference) · [Rate limiting](#rate-limiting--resilience) · [Crash recovery](#crash-recovery) · [Security model](#security-model) · [Benchmarks & tuning](#benchmarks--tuning)
+
+</div>
+
+---
+
+## Why this exists
+
+| Goal | What you get |
+|------|----------------|
+| **Transparency** | A map of Cursor’s dual backends (REST + ConnectRPC), auth flow, and privacy headers—backed by scanned methods and live CLIs. |
+| **Control** | Run the official SDK locally (`ca`), call arbitrary RPCs (`ca2`), or orchestrate isolated git worktrees with multiple agents (`ca3`). |
+| **Ownership** | Your API key, your machine, your repo. Swarm mode keeps blast radius bounded to disposable worktrees under a temp prefix. |
+
+This is **educational and operational** tooling for subscribers exploring an API they pay for—not a circumvention or abuse kit. Use it responsibly.
+
+---
+
+## Repository layout
 
 ```
 cursor-sdk-hacker/
 ├── src/
-│   ├── ca.mjs          # Local SDK agent (ask, code) + REST API client
-│   └── ca2.mjs         # ConnectRPC recon (96 models, 50+ RPC, full account)
+│   ├── ca.mjs              # Local SDK agent + REST (api.cursor.com)
+│   ├── ca2.mjs             # ConnectRPC + curl (api2.cursor.sh)
+│   ├── ca3.mjs             # Venom Swarm orchestrator (parallel agents)
+│   ├── ca3-review.mjs      # Standalone diff/review helper
+│   └── lib/
+│       ├── swarm.mjs       # Orchestration, ledger hooks, integrator stage
+│       ├── rate-limiter.mjs# Retries, backoff, batch staggering
+│       ├── ledger.mjs      # Persistent swarm task state (.venom-swarm/)
+│       ├── worktrees.mjs   # Git worktree lifecycle
+│       ├── decomposer.mjs  # Planner / task decomposition
+│       ├── integrator.mjs  # Merge + semantic integration agent
+│       └── reviewer.mjs    # Diffs, conflicts, merge order
 ├── docs/
-│   ├── REVERSE_ENGINEERING.md  # Complete reverse engineering report
-│   ├── API_REFERENCE.md        # Every endpoint documented
-│   └── METHODS_SCAN.md         # Scan results (113 methods tested)
+│   ├── REVERSE_ENGINEERING.md
+│   ├── API_REFERENCE.md
+│   └── METHODS_SCAN.md
 ├── package.json
-├── .gitignore
 ├── .env.example
-├── LICENSE
-└── README.md
+└── LICENSE
 ```
 
-## Install
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           YOUR ENVIRONMENT                                   │
+│  ┌──────────────┐   ┌──────────────┐   ┌──────────────────────────────────┐ │
+│  │   ~/.cursor  │   │   git repo   │   │  $TMPDIR/venom-swarm/            │ │
+│  │ -api-key     │   │  (worktrees) │   │  isolated agent worktrees        │ │
+│  └──────┬───────┘   └──────┬───────┘   └──────────────────────────────────┘ │
+│         │                  │                      ▲                           │
+│         v                  v                      │ ca3 swarm / fork           │
+│  ┌─────────────────────────────────────────────────────────────────────────┐ │
+│  │                        Cursor SDK Hacker CLIs                          │ │
+│  │  ┌─────────────┐    ┌─────────────┐    ┌─────────────────────────────┐  │ │
+│  │  │ ca.mjs      │    │ ca2.mjs     │    │ ca3.mjs + lib/*.mjs         │  │ │
+│  │  │ SDK Agent   │    │ curl RPC    │    │ Orchestrator + ledger +     │  │ │
+│  │  │ + REST      │    │ + JWT cache │    │ rate limit + integrator     │  │ │
+│  │  └──────┬──────┘    └──────┬──────┘    └─────────────────────────────┘  │ │
+│  └─────────┼──────────────────┼────────────────────────────────────────────┘ │
+└────────────┼──────────────────┼──────────────────────────────────────────────┘
+             │                  │
+             v                  v
+┌──────────────────────────────┴───────────────────────────────────────────────┐
+│                        CURSOR CLOUD                                           │
+│  ┌─────────────────────┐          ┌─────────────────────────────────────────┐ │
+│  │ api.cursor.com      │          │ api2.cursor.sh (ConnectRPC)            │ │
+│  │ REST: /v1/*         │          │ POST /{service}/{method}                 │ │
+│  │ Bearer: API key     │          │ Bearer: JWT from key exchange           │ │
+│  └─────────────────────┘          └─────────────────────────────────────────┘ │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+Auth trail (ConnectRPC path):
+   crsr_* API key ──► POST .../auth/exchange_user_api_key ──► JWT (cached ~1h, refresh margin 5m)
+```
+
+**Design principles**
+
+- **`ca2` uses `curl`** to reduce Node-side rate-limit pressure (documented in upstream recon).
+- **`ca3` uses staggered batches** (`batchWithStagger`) so parallel agents do not hammer the API in one tick.
+- **Worktrees are detached** at the current `HEAD` commit so workers do not fight over branch ref updates.
+
+---
+
+## Installation
+
+**Requirements:** Node.js **18+**, `git`, `curl`, and a Cursor API key from [cursor.com/dashboard/integrations](https://cursor.com/dashboard/integrations).
 
 ```bash
 git clone https://github.com/kariemSeiam/cursor-sdk-hacker.git
 cd cursor-sdk-hacker
 npm install
-
-# The CLIs are now available globally via npm bin:
-npx ca --version
-npx ca2 --version
-
-# Or symlink manually:
-sudo ln -sf $(pwd)/src/ca.mjs /usr/local/bin/ca
-sudo ln -sf $(pwd)/src/ca2.mjs /usr/local/bin/ca2
 ```
 
-## Setup
+Binaries (from `package.json`): `ca`, `ca2`, `ca3`, `ca3-review`.
 
 ```bash
-# Option 1: Environment variable
+npx ca --version
+npx ca2 models
+npx ca3 help
+```
+
+Optional global links:
+
+```bash
+chmod +x src/*.mjs
+sudo ln -sf "$(pwd)/src/ca.mjs" /usr/local/bin/ca
+sudo ln -sf "$(pwd)/src/ca2.mjs" /usr/local/bin/ca2
+sudo ln -sf "$(pwd)/src/ca3.mjs" /usr/local/bin/ca3
+sudo ln -sf "$(pwd)/src/ca3-review.mjs" /usr/local/bin/ca3-review
+```
+
+### Credentials
+
+```bash
+# Option A — environment
 export CURSOR_API_KEY="crsr_xxxxxxxxxxxx"
 
-# Option 2: Save to file (auto-detected by both CLIs)
-echo "crsr_xxxxxxxxxxxx" > ~/.cursor-api-key
+# Option B — file (default path both CLIs look for)
+printf '%s\n' "crsr_xxxxxxxxxxxx" > ~/.cursor-api-key
 chmod 600 ~/.cursor-api-key
 ```
 
-## `ca` — Local SDK Agent + REST API
+Copy `.env.example` to `.env` if your tooling loads it; the CLIs primarily use `CURSOR_API_KEY` / `~/.cursor-api-key`.
 
-Uses `@cursor/sdk` to run Composer locally on your machine (reads/writes files, runs commands).
-
-```bash
-# Ask anything
-ca ask "what is 2+2?"
-
-# Give it a coding task (it creates/modifies files in your CWD)
-ca code "create a hello.py that prints 'Hello from VENOM'"
-
-# Use thorough mode (slower, better reasoning)
-ca code "refactor the auth module" --model composer-2:fast=false
-
-# Cloud REST API commands
-ca models                # List all cloud models
-ca me                    # Account info
-ca agents                # List cloud agents
-ca raw GET /v1/models    # Raw API call
-
-# Flags
-ca --version             # Show version
-ca --help                # This help
-ca --model <id[:params]> # Override model
-```
-
-### Model System (SDK v1.0.9+)
-
-Models use **parameters**, not separate IDs. `composer-2-fast` is now `composer-2` with `{ fast: "true" }`:
-
-```bash
-ca ask "quick question"                    # default: composer-2 (fast=true)
-ca code "hard task" --model composer-2:fast=false  # thorough mode
-```
-
-Available local models:
-- `composer-2` (default, fast=true)
-- `composer-2:fast=false` (more thorough)
-- `composer-1.5` (legacy)
-
-### Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `CURSOR_API_KEY` | — | API key (or save to `~/.cursor-api-key`) |
-| `CURSOR_MODEL` | `composer-2` | Override default model |
-| `CURSOR_KEY_FILE` | `~/.cursor-api-key` | Custom key file path |
-| `CURSOR_BACKEND_URL` | `https://api.cursor.com` | REST API base URL |
-
-## `ca2` — ConnectRPC Recon
-
-Direct access to Cursor's ConnectRPC backend (`api2.cursor.sh`). Uses curl to avoid Node.js rate limiting.
-
-```bash
-# Account & billing
-ca2 usage                 # Billing usage + 30d analytics
-ca2 account               # Full account dump (billing, privacy, keys, segments)
-ca2 privacy               # Get/set privacy mode
-
-# Models & tools
-ca2 models                # List all 96 models (ConnectRPC catalog)
-ca2 skills                # 14 managed skills + 11 slash commands
-ca2 experiments           # Active A/B experiments
-
-# Deep recon
-ca2 scan                  # Test 50+ DashboardService methods
-ca2 explore               # Probe hidden/undocumented endpoints
-ca2 rpc <service> <method> [body]  # Call ANY RPC method directly
-
-# Chat (REST, not SDK)
-ca2 ask "question" [model]
-ca2 stream "question" [model]
-```
-
-### ConnectRPC Services
-
-| Service | Methods | Purpose |
-|---------|---------|---------|
-| `agent.v1.AgentService` | 47 | Models, agents, cloud runs, skills, MCP, webhooks |
-| `aiserver.v1.DashboardService` | 61 | Account, billing, plugins, privacy, teams |
-| `aiserver.v1.AnalyticsService` | 5 | Statsig, feature flags, event tracking |
-
-## What We Found
-
-### 🔓 Dual API System
-
-| Backend | URL | Protocol | Methods |
-|---------|-----|----------|---------|
-| **ConnectRPC** | `api2.cursor.sh` | JSON over HTTP POST | 250+ |
-| **REST** | `api.cursor.com` | OpenAI-compatible | 5+ |
-
-### 🔑 Auth Flow
-
-```
-API Key (crsr_xxx)
-  → POST api2.cursor.sh/auth/exchange_user_api_key
-  → { accessToken: "JWT...", refreshToken: "..." }
-  → Use JWT as Bearer token for all RPC calls
-  → JWT valid 1hr, auto-refresh 5min before expiry
-```
-
-### 🛡️ Ghost Mode (Privacy)
-
-- Header: `x-ghost-mode: true/false`
-- **NOT a hash** — just a boolean string
-- Modes 0,1,2 → ghost=true (no training)
-- Modes 3,4 → ghost=false (training allowed)
-- Default: true (safe by design)
-
-### 🧠 96 Models
-
-See [docs/API_REFERENCE.md](docs/API_REFERENCE.md) for the full catalog.
-
-### 🔌 22 Builtin Agent Tools
-
-`SEARCH`, `EDIT`, `LS`, `READ_FILE`, `WRITE_FILE`, `WEB_FETCH`, `RUN_TERMINAL_COMMAND`, `APPLY_DIFF`, `COMPUTER_USE`, `MCP_CALL`, `GOTODEF`, `RIPGREP_SEARCH`, `SEARCH_SYMBOLS`, `NEW_FILE`, `DELETE_FILE`, `TODO_READ`, `TODO_WRITE`, `CREATE_DIAGRAM`, `CREATE_PLAN`, `KNOWLEDGE_BASE`, `DEEP_SEARCH`, `WRITE_SHELL_STDIN`
-
-## Rate Limits
-
-| Code | Meaning | Mitigation |
-|------|---------|------------|
-| 429 | Standard rate limit | Retry with backoff |
-| 464 | IP-level rate limit | Use curl, add delays, cache tokens |
-| 401 | Unauthorized (team methods) | Need team membership |
-
-## Requirements
-
-- Node.js 18+
-- A Cursor API key from [cursor.com/dashboard/integrations](https://cursor.com/dashboard/integrations)
-- `curl` (for ca2)
-
-## Documentation
-
-- [docs/REVERSE_ENGINEERING.md](docs/REVERSE_ENGINEERING.md) — Full technical report
-- [docs/API_REFERENCE.md](docs/API_REFERENCE.md) — Every endpoint documented
-- [docs/METHODS_SCAN.md](docs/METHODS_SCAN.md) — 113 methods tested
-
-## Disclaimer
-
-This is for educational and personal use. We're exploring an API we pay for. Don't abuse it.
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `CURSOR_API_KEY` | — | API key |
+| `CURSOR_KEY_FILE` | `~/.cursor-api-key` | Alternate key file |
+| `CURSOR_MODEL` | `composer-2` | Default model for `ca` (overridable with `--model`) |
+| `CURSOR_BACKEND_URL` | `https://api.cursor.com` | REST base for `ca` |
 
 ---
 
-**Built by VENOM 🐙** — [Kariem Seiam](https://github.com/kariemSeiam)
+## Quickstart
+
+**1 — Local coding agent (SDK on your disk)**
+
+```bash
+cd /path/to/your/project
+npx ca ask "Summarize this repo in three bullets"
+npx ca code "Add a minimal README section on testing"
+```
+
+**2 — Cloud / RPC inspection**
+
+```bash
+npx ca2 usage          # Billing + 30d-style analytics bundle
+npx ca2 models         # Full ConnectRPC catalog (90+ models)
+npx ca2 rpc agent.v1.AgentService GetUsableModels
+```
+
+**3 — Multi-agent swarm (git repo required)**
+
+```bash
+cd /path/to/git/repo
+npx ca3 plan "Ship OAuth2 login and session middleware"
+npx ca3 swarm "Ship OAuth2 login and session middleware" --plan --workers 3
+```
+
+---
+
+## CLI reference
+
+### `ca` — local SDK + REST (`src/ca.mjs`)
+
+| Command | Description |
+|---------|-------------|
+| `ca ask <question>` | Ask-only; streams assistant + tool traces |
+| `ca code <task>` | Coding task in **current working directory** |
+| `ca me` | `GET /v1/me` |
+| `ca models` | REST models + local SDK model hints |
+| `ca repos` | `GET /v1/repositories` |
+| `ca agents [limit]` | List cloud agents |
+| `ca prompt <text>` | Create cloud agent run + stream + delete |
+| `ca runs <agentId>` | List runs |
+| `ca stream <agentId> <runId>` | Resume SSE stream |
+| `ca delete <agentId>` | Delete agent |
+| `ca raw <METHOD> <path> [json]` | Escape hatch REST |
+
+**Flags:** `--model <id[:k=v,k2=v2]>`, `--version`, `--help`
+
+```bash
+ca code "Refactor config loading" --model composer-2:fast=false
+ca agents 50
+ca raw GET /v1/models
+ca raw POST /v1/some/path '{"example":true}'
+```
+
+**Model note (SDK ≥ 1.0.9):** parameters live on the model object—e.g. thorough Composer: `composer-2:fast=false`.
+
+---
+
+### `ca2` — ConnectRPC via `curl` (`src/ca2.mjs`)
+
+| Command | Description |
+|---------|-------------|
+| `ca2 models` | Printable catalog (grouped) |
+| `ca2 usage` | Usage + analytics |
+| `ca2 account` | Deep account / billing / keys / segments |
+| `ca2 skills` | Managed skills + slash commands |
+| `ca2 experiments` | Statsig experiments snapshot |
+| `ca2 scan` | Probe many `DashboardService` methods |
+| `ca2 explore` | Ad-hoc undocumented / interesting RPC probes |
+| `ca2 rpc <service> <method> [json]` | Generic RPC |
+| `ca2 agents` | REST agents listing |
+| `ca2 ask "<question>"` | REST chat completion (non-streaming) |
+| `ca2 stream "<question>"` | Streaming chat completion |
+| `ca2 privacy` | Get privacy mode |
+| `ca2 privacy <MODE>` | Set privacy mode enum |
+
+```bash
+ca2 rpc aiserver.v1.DashboardService GetUserAnalytics '{"days": 7}'
+ca2 scan
+ca2 ask "Explain async iterators in JS"
+ca2 stream "Draft a regex for IPv6"
+```
+
+Note: `ca2 ask` / `ca2 stream` concatenate every token after the subcommand into one prompt string; override the default chat model by editing `cmdAsk` / `cmdStream` in `src/ca2.mjs` or call `ca2 rpc` / `ca raw` for full control.
+
+
+---
+
+### `ca3` — Venom Swarm (`src/ca3.mjs`)
+
+| Command | Description |
+|---------|-------------|
+| `ca3 swarm "<task>"` | N parallel workers (same task or planner-driven with `--plan`) |
+| `ca3 fork "<spec1>" "<spec2>" ...` | One agent per spec string |
+| `ca3 plan "<task>"` | Decomposition preview (leader agent) |
+| `ca3 resume` | Resume path tied to ledger (see [Crash recovery](#crash-recovery)) |
+| `ca3 status` | Swarm file + ledger summary when running |
+| `ca3 kill` | Clear swarm state file |
+| `ca3 clean` | Remove orphaned swarm worktrees |
+| `ca3 models` | Curated model cheat-sheet |
+| `ca3 review` | Diff/conflict review for registered worktree paths |
+| `ca3 merge` | Conflict-aware merge ordering |
+| `ca3 integrate` | Run integrator agent on combined results |
+| `ca3 help` | Full inline help |
+
+**Flags**
+
+| Flag | Meaning |
+|------|---------|
+| `--workers N` | Parallel agents, **1–5** (default **3**) |
+| `--model <id[:p=v]>` | Override model |
+| `--plan` | Leader decomposes task, then workers execute specs |
+| `--integrator` | After success, run semantic integrator (`success > 1`) |
+| `--force-integrator` | Always run integrator agent when integrating |
+| `--no-cleanup` | Keep git worktrees after run (inspect / merge manually) |
+
+```bash
+ca3 plan "Build a blog with auth and comments"
+ca3 swarm "Build a blog with auth and comments" --plan --workers 4
+ca3 swarm "Fix all TODOs in src/" --workers 3 --model claude-sonnet-4-0
+ca3 fork "Add Stripe webhook" "Add admin dashboard" "Write API tests"
+ca3 swarm "Parallel refactor" --integrator
+ca3 resume
+ca3 clean
+```
+
+---
+
+### `ca3-review` — review-only (`src/ca3-review.mjs`)
+
+```bash
+ca3-review                  # human-readable report
+ca3-review --json           # machine-readable
+ca3-review --conflicts      # conflicts only
+ca3-review --merge          # merge feasibility summary
+ca3-review --no-diff        # stats without unified diff body
+```
+
+---
+
+## Swarm, fork, plan, integrate workflows
+
+### 1 · Plan (dry run)
+
+Use when the task is broad and you want **structure before spend**.
+
+```bash
+ca3 plan "Migrate JWT to session cookies across API and frontend"
+```
+
+The decomposer emits task scopes, optional path hints, dependencies, and a **level-style execution order** preview.
+
+### 2 · Swarm (parallel same task)
+
+Best for **speed / diversity**: multiple isolated actors attempt the same mission; you compare diffs.
+
+```bash
+ca3 swarm "Harden input validation on all public routes" --workers 3
+```
+
+### 3 · Swarm + plan (leader → workers)
+
+Best for **large features** with natural splits (auth, UI, migrations).
+
+```bash
+ca3 swarm "Implement billing: plans, Stripe, webhooks, emails" --plan --workers 5 --integrator
+```
+
+Sequence: **decompose → worktrees → staggered agent batch → optional integrator → cleanup**.
+
+### 4 · Fork (explicit specs)
+
+When you already know the breakdown—three prompts, three agents:
+
+```bash
+ca3 fork \
+  "Task A: database migrations" \
+  "Task B: GraphQL schema" \
+  "Task C: Playwright smoke tests"
+```
+
+### 5 · Integrate
+
+Optional second tier that merges semantically:
+
+- Pass `--integrator` on `swarm` / `fork`, **or**
+- Run `ca3 integrate` after a run **if** worktree paths are available to the tool (see ledger / `--no-cleanup` and `git worktree list` when debugging).
+
+The integrator builds a dedicated worktree under `.venom-swarm/integration-<timestamp>`, applies non-conflicting patches, and may invoke an agent for conflict resolution when needed.
+
+---
+
+## Rate limiting & resilience
+
+### HTTP / SDK (`lib/rate-limiter.mjs`)
+
+| Signal | Handling |
+|--------|----------|
+| **429** | Retry with exponential backoff + jitter |
+| **464** | Treated as stricter / IP-style cap: **longer** backoff |
+| **502 / 503 / 504** | Retried as network-class failures |
+| Non-retryable SDK errors | Fail fast |
+
+**Defaults:** up to **3** retries, base delay **1s**, cap **30s**, small jitter.
+
+### Orchestration (`lib/swarm.mjs`)
+
+- **`batchWithStagger`**: default **2000 ms** between waves to avoid synchronized spikes when many agents start together.
+- **Concurrency** follows configured worker count (capped at **5**).
+
+### ConnectRPC client (`ca2`)
+
+- Uses **`curl`** instead of Node’s HTTP stack for heavy RPC workloads (reduces self-inflicted throttling).
+- JWT cached under `~/.cache/cursor-jwt-cache.json` with refresh margin (see source).
+
+### Historical / observed codes (from recon)
+
+| Code | Meaning | Mitigation |
+|------|---------|------------|
+| 429 | Standard rate limit | Backoff, fewer parallel agents, cache |
+| 464 | IP-level pressure | Increase stagger, reduce concurrency, pause |
+| 401 | Missing team / feature | Check membership or endpoint eligibility |
+
+---
+
+## Crash recovery
+
+| Mechanism | Location | Role |
+|-----------|----------|------|
+| **Ledger** | `<repo>/.venom-swarm/ledger.json` | Persists swarm id, task text, per-task status, attempts, worktree paths |
+| **Swarm state** | `<project>/.tmp-cli/swarm-state.json` | Lightweight session metadata (used by CLI `status` / `kill`) |
+| **`ca3 resume`** | API | Reloads ledger-oriented orchestration state |
+
+**Operational guidance**
+
+1. If a run dies mid-flight, inspect `.venom-swarm/ledger.json` for **queued / failed / running** tasks and associated `worktreePath` entries.
+2. Use `ca3 clean` to garbage-collect **orphaned** worktrees (see `cleanupOrphanedWorktrees`).
+3. **`resumeSwarm` is still evolving** (checkpoint + ledger exist; full automatic replay may require following repo issues / PRs). Treat resume as **recovery scaffolding**, not a guarantee of hands-free continuation until your checkout matches mainline behavior.
+
+---
+
+## Security model
+
+| Topic | Behavior |
+|-------|----------|
+| **Secrets** | API key from `CURSOR_API_KEY` or `~/.cursor-api-key`. **Never** commit keys; chmod `600` on key files. |
+| **Transport** | HTTPS to Cursor endpoints; JWT short-lived for `api2`. |
+| **Ghost / privacy** | `ca2` sends `x-ghost-mode: true` on RPC by default—aligns with “no training” stance; use `ca2 privacy` for account-level policy. |
+| **Local execution** | `ca` / `ca3` run the SDK with **`local.cwd`** pointing at your tree or isolated worktrees—agents can edit files and run tools per Cursor’s model policy. |
+| **Isolation** | Swarm uses **detached git worktrees** under `$TMPDIR/venom-swarm/` so parallel experiments do not corrupt your main working tree until you merge intentionally. |
+| **Supply chain** | `npm install` pins `@cursor/sdk`; audit upgrades consciously. |
+
+---
+
+## Benchmarks & tuning
+
+There is **no substitute** for measuring on *your* network, model, and repository. Use this table of **implementation defaults** as a baseline for expectations and load shaping:
+
+| Constant | Value | Source (conceptual) |
+|----------|------|---------------------|
+| Max swarm workers | 5 | `MAX_WORKERS` |
+| Default workers | 3 | `DEFAULT_WORKERS` |
+| Batch stagger | ~2000 ms | `BATCH_STAGGER` |
+| Retry attempts | 3 | `MAX_RETRIES` (rate limiter) |
+| Backoff cap | 30 s | `MAX_DELAY` |
+
+**How to benchmark**
+
+```bash
+/usr/bin/time -p npx ca3 swarm "Microbench: add JSDoc to lib/*.mjs" --workers 3
+/usr/bin/time -p npx ca2 rpc agent.v1.AgentService GetUsableModels
+```
+
+Record wall time, **USD usage** from `ca2 usage`, and qualitative diff size. Regressions usually trace to **model choice**, **429/464**, or **IO-heavy repos** (large `node_modules` in scope).
+
+---
+
+## Further reading
+
+| Document | Contents |
+|----------|----------|
+| [docs/REVERSE_ENGINEERING.md](docs/REVERSE_ENGINEERING.md) | Full recon narrative |
+| [docs/API_REFERENCE.md](docs/API_REFERENCE.md) | Endpoint catalog |
+| [docs/METHODS_SCAN.md](docs/METHODS_SCAN.md) | Empirical method survey |
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE). Copyright © 2026 Kariem Seiam (VENOM).
+
+---
+
+<div align="center">
+
+**VENOM** · *Turning subscription dollars into sunlight on the wire.*
+
+[Report issues](https://github.com/kariemSeiam/cursor-sdk-hacker/issues) · [Upstream package](https://www.npmjs.com/package/@cursor/sdk)
+
+</div>

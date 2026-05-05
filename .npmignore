@@ -1,0 +1,12 @@
+.cursor/
+coverage/
+.idea/
+.tmp-cli/
+
+# Tests and CI are not bundled with the published package contents
+.github/
+test/
+
+# Tooling configs (consumers typically do not need these in the tarball)
+eslint.config.js
+.env.example

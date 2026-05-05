@@ -12,3 +12,7 @@ node_modules/
 
 # Cache
 .cache/
+
+# Tooling / coverage
+coverage/
+.eslintcache
