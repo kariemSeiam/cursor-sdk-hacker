@@ -6,6 +6,8 @@
 
 ## Authentication
 
+**Principal:** `crsr_*` values are **your** Cursor subscriber API keys. Bearer tokens and exchanged JWTs identify **your** account; there is no alternate “Cursor-authenticated” persona in these flows.
+
 ### Exchange API Key for JWT
 ```
 POST https://api2.cursor.sh/auth/exchange_user_api_key

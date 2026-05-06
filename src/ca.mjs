@@ -39,7 +39,7 @@ const clawMsg = m => console.log(`${c.mag}🦀${c.r} ${m}`);
 function getKey() {
   if (process.env.CURSOR_API_KEY) return process.env.CURSOR_API_KEY;
   if (existsSync(KEYFILE)) return readFileSync(KEYFILE, "utf8").trim();
-  fail("No API key. Set CURSOR_API_KEY or save to " + KEYFILE);
+  fail("No API key — set CURSOR_API_KEY or save your subscriber key to " + KEYFILE);
 }
 
 function enc(s) { return encodeURIComponent(s); }

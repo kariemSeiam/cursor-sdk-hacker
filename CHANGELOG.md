@@ -8,6 +8,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- **Docs & copy:** Frame API access as **your** subscriber identity (**your** key / JWT)—not Cursor acting as the authenticated user (`README.md`, `AGENTS.md`, `docs/troubleshooting.md`, `docs/API_REFERENCE.md`).
+- **CLI hints:** Missing-key errors from `ca`, `ca2`, and `swarm.getKey()` now say “your subscriber key.”
+- **Attribution:** Git history uses **kariemSeiam `<kariemseiam@gmail.com>`**; `package.json` `author`, `LICENSE`, README license footer aligned.
 - **Repo hygiene:** dropped optional clone-local CONTEXT/MEMORY subtree; orientation is **`AGENTS.md`**, **`docs/README.md`**, **`docs/architecture.md`**.
 - **Breaking paths:** Swarm ledger **`/.claw-swarm/`** and temp worktrees **`$TMPDIR/claw-swarm/`** are canonical again. Any clone that used interim alternate directory prefixes should rename those trees or delete them before the next swarm run.
 - Documentation spine for agents & humans: **`AGENTS.md`**, **[`docs/README.md`](docs/README.md)** (catalog + Markdown voice covenant); refreshed **CONTRIBUTING**, **CODE_OF_CONDUCT**, **examples/README**, and canonical headers on **`docs/*.md`**.

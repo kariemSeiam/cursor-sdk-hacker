@@ -12,7 +12,7 @@ Maintained from **[pigo.dev](https://pigo.dev)** · web docs **[claws.pigo.dev/c
 [![Node](https://img.shields.io/badge/node-%3E%3D18-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Cursor](https://img.shields.io/badge/Cursor-Pro%2B-000000?style=flat-square)](https://cursor.com/)
 
-**We pay for Cursor Pro+. This repository is our receipt turned into machinery:** documented APIs, runnable CLIs, and parallel agent workflows you can audit, extend, and run locally.
+**Your Cursor Pro+ subscription is yours—so is the auth:** these CLIs run with **your** subscriber API key (**you** are the authenticated party on every request, not “Cursor” impersonating you). This repository turns that into machinery: documented APIs, runnable CLIs, and parallel agent workflows you can audit, extend, and run locally.
 
 [Installation](#installation) · [Quickstart](#quickstart) · [Architecture](#architecture) · [Swarm workflows](#swarm-fork-plan-integrate-workflows) · [CLI reference](#cli-reference) · [Rate limiting](#rate-limiting--resilience) · [Crash recovery](#crash-recovery) · [Security model](#security-model) · [Benchmarks & tuning](#benchmarks--tuning)
 
@@ -22,13 +22,13 @@ Maintained from **[pigo.dev](https://pigo.dev)** · web docs **[claws.pigo.dev/c
 
 ---
 
-> **Canon** · **Cursor Claw** ships as **`cursor-calw`** ([npm](https://www.npmjs.com/package/cursor-calw)); repo [`kariemSeiam/cursor-calw`](https://github.com/kariemSeiam/cursor-calw); editorial [pigo.dev](https://pigo.dev); long-form docs also at [claws.pigo.dev/cursor](https://claws.pigo.dev/cursor). MIT. CLIs bind official [`@cursor/sdk`](https://www.npmjs.com/package/@cursor/sdk) — subscribers exploring APIs they already fund.
+> **Canon** · **Cursor Claw** ships as **`cursor-calw`** ([npm](https://www.npmjs.com/package/cursor-calw)); repo [`kariemSeiam/cursor-calw`](https://github.com/kariemSeiam/cursor-calw); editorial [pigo.dev](https://pigo.dev); long-form docs also at [claws.pigo.dev/cursor](https://claws.pigo.dev/cursor). MIT. CLIs bind official [`@cursor/sdk`](https://www.npmjs.com/package/@cursor/sdk); **your** subscriber API key is **your** authenticated identity upstream—inspect APIs **you** fund.
 
 ## Why this exists
 
 | Goal | What you get |
 |------|----------------|
-| **Transparency** | A map of Cursor’s dual backends (REST + ConnectRPC), auth flow, and privacy headers—backed by scanned methods and live CLIs. |
+| **Transparency** | A map of Cursor’s dual backends (REST + ConnectRPC), **your** Bearer credentials (API key / exchanged JWT), and privacy headers—backed by scanned methods and live CLIs. |
 | **Control** | Run the official SDK locally (`ca`), call arbitrary RPCs (`ca2`), or orchestrate isolated git worktrees with multiple agents (`ca3`). |
 | **Ownership** | Your API key, your machine, your repo. Swarm mode keeps blast radius bounded to disposable worktrees under a temp prefix. |
 
@@ -101,12 +101,12 @@ cursor-calw/
 │  ┌─────────────────────┐          ┌─────────────────────────────────────────┐ │
 │  │ api.cursor.com      │          │ api2.cursor.sh (ConnectRPC)            │ │
 │  │ REST: /v1/*         │          │ POST /{service}/{method}                 │ │
-│  │ Bearer: API key     │          │ Bearer: JWT from key exchange           │ │
+│  │ Bearer: YOUR key    │          │ Bearer: JWT minted from YOUR key        │ │
 │  └─────────────────────┘          └─────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────────────────────┘
 
-Auth trail (ConnectRPC path):
-   crsr_* API key ──► POST .../auth/exchange_user_api_key ──► JWT (cached ~1h, refresh margin 5m)
+Auth trail (ConnectRPC path) — YOU present YOUR subscriber key end-to-end:
+   YOUR crsr_* key ──► POST .../auth/exchange_user_api_key ──► short-lived JWT (cached ~1h, refresh margin 5m)
 ```
 
 **Design principles**
@@ -119,7 +119,7 @@ Auth trail (ConnectRPC path):
 
 ## Installation
 
-**Requirements:** Node.js **18+**, `git`, `curl`, and a Cursor API key from [cursor.com/dashboard/integrations](https://cursor.com/dashboard/integrations).
+**Requirements:** Node.js **18+**, `git`, `curl`, and **your** Cursor account API key from [cursor.com/dashboard/integrations](https://cursor.com/dashboard/integrations) (**you** are the authenticated user that key represents).
 
 ```bash
 git clone https://github.com/kariemSeiam/cursor-calw.git
@@ -160,7 +160,7 @@ Copy `.env.example` to `.env` if your tooling loads it; the CLIs primarily use `
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `CURSOR_API_KEY` | — | API key |
+| `CURSOR_API_KEY` | — | **Your** Cursor subscriber API key |
 | `CURSOR_KEY_FILE` | `~/.cursor-api-key` | Alternate key file |
 | `CURSOR_MODEL` | `composer-2` | Default model for `ca` (overridable with `--model`) |
 | `CURSOR_BACKEND_URL` | `https://api.cursor.com` | REST base for `ca` |
@@ -413,8 +413,8 @@ The integrator builds a dedicated worktree under `.claw-swarm/integration-<times
 
 | Topic | Behavior |
 |-------|----------|
-| **Secrets** | API key from `CURSOR_API_KEY` or `~/.cursor-api-key`. **Never** commit keys; chmod `600` on key files. |
-| **Transport** | HTTPS to Cursor endpoints; JWT short-lived for `api2`. |
+| **Secrets** | **Your** key via `CURSOR_API_KEY` or `~/.cursor-api-key`; only **you** can present it. **Never** commit keys; chmod `600` on key files. |
+| **Transport** | HTTPS to Cursor endpoints; short-lived JWTs are minted **for your key**, not generic “Cursor auth.” |
 | **Ghost / privacy** | `ca2` sends `x-ghost-mode: true` on RPC by default—aligns with “no training” stance; use `ca2 privacy` for account-level policy. |
 | **Local execution** | `ca` / `ca3` run the SDK with **`local.cwd`** pointing at your tree or isolated worktrees—agents can edit files and run tools per Cursor’s model policy. |
 | **Isolation** | Swarm uses **detached git worktrees** under `$TMPDIR/claw-swarm/` so parallel experiments do not corrupt your main working tree until you merge intentionally. |

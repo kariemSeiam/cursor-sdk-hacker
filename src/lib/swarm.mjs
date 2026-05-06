@@ -59,7 +59,7 @@ function getKey() {
   try {
     return require("fs").readFileSync(keyfile, "utf8").trim();
   } catch {
-    throw new Error("No API key. Set CURSOR_API_KEY or save to ~/.cursor-api-key");
+    throw new Error("No API key — set CURSOR_API_KEY or save your subscriber key to ~/.cursor-api-key");
   }
 }
 

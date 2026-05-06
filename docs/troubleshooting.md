@@ -9,7 +9,7 @@
 ## Quick diagnostic checklist
 
 1. **Git:** `git rev-parse --show-toplevel` succeeds from your project (Swarm requires a repo).
-2. **Key:** `CURSOR_API_KEY` set, or readable `~/.cursor-api-key` (see `ca` / `ca3` key resolution).
+2. **Your key:** `CURSOR_API_KEY` exports **your** subscriber key, or `~/.cursor-api-key` is readable (**you** authenticate—see `ca` / `ca3` resolution).
 3. **Disk:** Enough space for OS temp worktrees under `$TMPDIR/claw-swarm`.
 4. **State:** If behavior is weird after a crash, check `.claw-swarm/ledger.json` and `.tmp-cli/swarm-state.json`.
 
@@ -23,7 +23,7 @@
 
 **Fixes:**
 
-- Export **`CURSOR_API_KEY`** or place the key in **`~/.cursor-api-key`** with restrictive permissions (`chmod 600`).
+- Export **`CURSOR_API_KEY`** (**your** key) or write it to **`~/.cursor-api-key`** with restrictive permissions (`chmod 600`). **You** are always the authenticated party—there is no “Cursor authenticates” side channel.
 - For `@cursor/sdk`, **`apiKey` must be passed into `Agent.create()`**; ConnectRPC transport does not infer the key from the environment alone (see [REVERSE_ENGINEERING.md](./REVERSE_ENGINEERING.md)).
 
 ### Rate limits: HTTP 429

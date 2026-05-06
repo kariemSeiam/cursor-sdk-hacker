@@ -23,7 +23,7 @@ let tokenFile = `${homedir()}/.cache/cursor-jwt-cache.json`;
 function getApiKey() {
   if (process.env.CURSOR_API_KEY) return process.env.CURSOR_API_KEY;
   if (existsSync(KEY_FILE)) return readFileSync(KEY_FILE, 'utf8').trim();
-  throw new Error('No API key. Set CURSOR_API_KEY or save to ' + KEY_FILE);
+  throw new Error('No API key — set CURSOR_API_KEY or save your subscriber key to ' + KEY_FILE);
 }
 
 function loadCachedToken() {
