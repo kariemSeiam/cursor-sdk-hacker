@@ -35,7 +35,7 @@
     "agent",
     "swarm"
   ],
-  "author": "Cursor Claw (https://pigo.dev)",
+  "author": "kariemSeiam <kariemseiam@gmail.com> (https://pigo.dev)",
   "engines": {
     "node": ">=18"
   },

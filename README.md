@@ -463,7 +463,7 @@ Record wall time, **USD usage** from `ca2 usage`, and qualitative diff size. Reg
 
 ## License
 
-MIT — see [LICENSE](LICENSE). © 2026 Cursor Claw · [pigo.dev](https://pigo.dev).
+MIT — see [LICENSE](LICENSE). © 2026 kariemSeiam · [pigo.dev](https://pigo.dev).
 
 ---
 
