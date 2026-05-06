@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * ca — Cursor Agent CLI (VENOM Edition) 🐙
+ * ca — Cursor Claw · local SDK + REST (VENOM) 🦀
  * Local SDK execution (composer-2) + REST API (api.cursor.com)
  *
  * Model system (SDK v1.0.9+):
@@ -10,6 +10,7 @@
  */
 
 import { readFileSync, existsSync, mkdirSync, unlinkSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFile } from "node:child_process";
@@ -17,7 +18,7 @@ import { execFile } from "node:child_process";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, "..");
 const BASE_URL = process.env.CURSOR_BACKEND_URL || "https://api.cursor.com";
-const KEYFILE = process.env.CURSOR_KEY_FILE || (process.env.HOME || "/home/pigo") + "/.cursor-api-key";
+const KEYFILE = process.env.CURSOR_KEY_FILE || join(homedir(), ".cursor-api-key");
 const VERSION = "1.1.0";
 
 // Default model + params. composer-2 defaults to fast=true when no params given.

@@ -1,6 +1,8 @@
-# Cursor SDK Reverse Engineering Report
+# Cursor Claw · Reverse-engineering appendix (`@cursor/sdk`)
 
-> Complete technical analysis of Cursor's SDK bundle and API infrastructure.
+> **Canon** · Companion to **Cursor Claw** [`cursor-calw`](https://github.com/kariemSeiam/cursor-calw) · MIT · factual recon only.
+
+**You are reading:** deep technical analysis of Cursor’s SDK bundle and dual API infrastructure maintained for operators who need **ground truth beyond marketing copy**.
 
 ## Overview
 

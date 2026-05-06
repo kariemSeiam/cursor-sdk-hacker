@@ -1,49 +1,80 @@
-## Contributing
+# Contributing to Cursor Claw
 
-Thanks for improving this project.
+**Cursor Claw** (`cursor-calw` on [npm](https://www.npmjs.com/package/cursor-calw), [`kariemSeiam/cursor-calw`](https://github.com/kariemSeiam/cursor-calw) on GitHub) exists because Cursor Pro+ subscribers deserve **inspectable machinery** — not folklore. Contributions that keep CLI behavior honest, documented, and test-backed are welcome.
 
-### Prerequisites
+Before you draft prose patches, skim **[docs/README.md → Documentation voice](docs/README.md#documentation-voice)** — it is how VENOM keeps Markdown consistent across fourteen files without drift.
 
-Node.js compatible with [`package.json`](package.json) `engines` (use `node --version` locally).
+---
 
-### Reporting issues
+## Prerequisites
 
-- Use the repo’s **Issues** tab for reproducible bugs, documentation gaps, or feature ideas.
-- Include version of Node (`node -v`), the command you ran, and what happened vs. what you expected.
+| Requirement | Notes |
+|-------------|--------|
+| **Node.js** | **≥ 18** (see `"engines"` in [`package.json`](package.json)). Run `node -v`. |
+| **git** · **curl** | Required for Swarm workflows and ConnectRPC probing via `ca2`. |
 
-### Workflow
+---
 
-1. Fork the repo and create a branch from `main` (or the default branch).
-2. Install dependencies with `npm ci`.
-3. Make focused changes tied to one concern when possible.
+## Reporting issues
 
-### Verification
+- Open [GitHub Issues](https://github.com/kariemSeiam/cursor-calw/issues) with **reproduction**, `node -v`, exact command lines, observed vs expected.
+- Mention whether the failure touches **`ca`** (SDK/local), **`ca2`** (curl RPC), **`ca3`** (swarm/worktrees), or **docs**.
 
-Before you open a PR, please run:
+---
+
+## Development workflow
+
+1. Fork **`cursor-calw`** → branch from **`main`**.
+2. `npm ci` (CI uses the same lockfile discipline).
+3. Keep changes **narrow** unless a maintainer-approved refactor is in flight.
+
+---
+
+## Verification (blocking before PR)
 
 ```bash
 npm run lint
 npm test
 ```
 
-Tests use Node’s built-in test runner (`node --test`). New behaviour should ship with automated coverage where reasonable.
+| Suite | Meaning |
+|-------|---------|
+| `npm test` | `node:test` suites under [`test/`](test/). |
+| `npm run lint` | ESLint 9 (`eslint.config.js`). **Warnings allowed today** unless CI adopts `--max-warnings 0`. |
 
-### Code style
+New behavior warrants tests or a deliberate exception noted in PR description.
 
-Linting follows [ESLint](eslint.config.js) with the [`eslint:recommended`](https://eslint.org/docs/latest/rules/) baseline. Prefer matching surrounding patterns rather than rewriting unrelated modules.
+---
 
-Keep secrets out of commits: API keys belong in `.env` (ignored by Git), not in tracked files—see [.env.example](.env.example) for variable names where applicable.
+## Code & documentation coupling
 
-### Pull requests
+| If you change… | Update also… |
+|----------------|--------------|
+| `ca` · `ca2` · `ca3` public flags or subcommands | [README.md](README.md) CLI tables |
+| Swarm internals, limits, filenames | [`docs/architecture.md`](docs/architecture.md) ± [`.venom/CONTEXT.md`](.venom/CONTEXT.md) |
+| Operator playbook material | [`docs/swarm-patterns.md`](docs/swarm-patterns.md) or [`docs/troubleshooting.md`](docs/troubleshooting.md) |
+| RPC / HTTP catalog | [`docs/API_REFERENCE.md`](docs/API_REFERENCE.md) (and CONTEXT **only if** topology changes) |
 
-- Describe the motivation and summarize the behaviour change for reviewers.
-- Link related issues (`Fixes #123`) when relevant.
-- If you change CLI behaviour or public docs, reflect that in README or `/docs/` as appropriate.
+**Never** stash secrets — keys live in `CURSOR_API_KEY` / `~/.cursor-api-key` per [README](README.md) and [.env.example](.env.example).
 
-### Releases (maintainers)
+---
 
-Publishing to npm runs from [`.github/workflows/publish.yml`](.github/workflows/publish.yml) when a version tag matching `v*` is pushed (for example after `git tag v1.2.0 && git push origin v1.2.0`). Configure an **NPM_TOKEN** repository secret with a token that has publish access to the package scope.
+## Pull requests
 
-### Code of Conduct
+- Motivation paragraph + behavioural summary — reviewers should reconstruct intent without archaeology.
+- `Fixes #nnn` hooks when applicable.
+- Release-facing changes logged under **[CHANGELOG.md](CHANGELOG.md) `[Unreleased]`**.
 
-Interactions in this repository are governed by [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+Community tone: **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)**
+
+---
+
+## Releases (maintainers)
+
+Tag-driven publish per [`.github/workflows/publish.yml`](.github/workflows/publish.yml): push **`v*`** tags after versioning `package.json` and consolidating **CHANGELOG**.
+
+```bash
+git tag v1.x.x && git push origin v1.x.x
+```
+
+Configure **`NPM_TOKEN`** with publish capability for **`cursor-calw`**.

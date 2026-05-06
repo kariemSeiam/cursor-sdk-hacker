@@ -1,6 +1,8 @@
-# Methods Scan Results
+# Cursor Claw · Methods scan appendix
 
-> Automated scan of all 3 ConnectRPC services — 100+ methods tested.
+> **Canon** · Aggregate output from **Cursor Claw** `ca2`/probes against [`api2.cursor.sh`](https://api2.cursor.sh) · MIT · snapshot in time — rescan when upstream drifts.
+
+**You are reading:** automated ConnectRPC survey totals — three services, 100+ exercised methods, pass/fail shorthand.
 
 ## Summary
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * ca3 — Venom Swarm CLI v4 🐙
- * Multi-agent parallel orchestration via Cursor SDK
+ * ca3 — Cursor Claw · Venom Swarm 🦀
+ * Multi-agent parallel orchestration via @cursor/sdk
  *
  * Usage:
  *   ca3 swarm "<task>" [--workers 3] [--model composer-2] [--plan]
@@ -30,7 +30,7 @@ import { cleanupOrphanedWorktrees, getRepoRoot } from "./lib/worktrees.mjs";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, "..");
 const SWARM_STATE = join(REPO_ROOT, ".tmp-cli", "swarm-state.json");
-const VERSION = "4.0.0-venom-swarm";
+const VERSION = JSON.parse(readFileSync(join(REPO_ROOT, "package.json"), "utf8")).version;
 
 // ─── Colors ────────────────────────────────────────────────
 

@@ -1,8 +1,15 @@
-# Changelog
+# Changelog · Cursor Claw (`cursor-calw`)
 
-All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as reflected in `package.json`. The **Swarm CLI** (`ca3`) also prints an internal build label **`4.0.0-venom-swarm`** (see `src/ca3.mjs`), which may move independently of npm semver until unified.
+> Pack line: **[`kariemSeiam/cursor-calw`](https://github.com/kariemSeiam/cursor-calw)** · npm **`cursor-calw`** · MIT.
+
+All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as reflected in `package.json`. The **Swarm CLI** (`ca3`) reads its displayed version from root `package.json`.
 
 ## [Unreleased]
+
+### Changed
+
+- Documentation spine for agents & humans: **`AGENTS.md`**, **[`docs/README.md`](docs/README.md)** (catalog + Markdown voice covenant); refreshed **CONTRIBUTING**, **CODE_OF_CONDUCT**, **examples/README**, and canonical headers on **`docs/*.md`**.
+- Project **renamed to Cursor Claw**; GitHub repository: [kariemSeiam/cursor-calw](https://github.com/kariemSeiam/cursor-calw). npm package **`cursor-calw`** (slug matches repo).
 
 ### Added
 
@@ -45,8 +52,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 | Artifact | Version / label | Source |
 |----------|-----------------|--------|
-| npm package | `1.1.0` | `package.json` `"version"` |
-| Swarm CLI banner | `4.0.0-venom-swarm` | `VERSION` in `src/ca3.mjs` |
+| npm package | mirrors `"version"` in `package.json` | `package.json` |
+| Swarm CLI banner | same semver string | [`src/ca3.mjs`](src/ca3.mjs) reads root `package.json` at startup |
 | Ledger schema | `version: 1` | `Ledger._fresh()` in `src/lib/ledger.mjs` |
 
 When a release is tagged, replace **Unreleased** with the new semver and a date, and move items accordingly.

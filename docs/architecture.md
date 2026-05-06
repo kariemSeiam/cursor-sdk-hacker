@@ -1,6 +1,10 @@
-# Architecture — Venom Swarm & Cursor SDK tooling
+# Architecture — Cursor Claw (Venom Swarm & SDK tooling)
 
-This document describes how the **Venom Swarm** multi-agent orchestrator fits together with the **Cursor SDK**, how data moves through a run, how **Git worktrees** isolate workers, and where **SQLite** appears in the stack (SDK agent store vs. local swarm ledger).
+> **Canon** · **Cursor Claw** [`cursor-calw`](https://github.com/kariemSeiam/cursor-calw) · npm [`cursor-calw`](https://www.npmjs.com/package/cursor-calw) · MIT · VENOM-maintained **`docs/`** prose follows [`README.md`](./README.md#documentation-voice).
+
+This document describes how the **Venom Swarm** multi-agent orchestrator fits together with the [**`@cursor/sdk`**](https://www.npmjs.com/package/@cursor/sdk), how data flows through a run, how **Git worktrees** isolate workers, and where **SQLite** appears relative to Swarm’s JSON ledger.
+
+**You are reading:** internals — diagrams, ledger phases, SQLite split, orchestrator constants.
 
 ---
 
@@ -150,6 +154,7 @@ Swarm’s **durable run state** for recovery is **`.venom-swarm/ledger.json`** �
 
 ## Related docs
 
-- [swarm-patterns.md](./swarm-patterns.md) — when to use swarm vs. fork vs. plan, scaling.
+- [docs/README.md](./README.md) — TOC + Markdown voice covenant.
+- [swarm-patterns.md](./swarm-patterns.md) — when to use swarm vs. fork vs. plan; scaling heuristics.
 - [troubleshooting.md](./troubleshooting.md) — errors, Git repair, rate limits.
-- [API_REFERENCE.md](./API_REFERENCE.md) — Cursor HTTP/RPC surfaces (broader project).
+- [API_REFERENCE.md](./API_REFERENCE.md) — Cursor HTTP / ConnectRPC catalog (broader project appendix).

@@ -1,17 +1,10 @@
 <div align="center">
 
-```
- ██████╗ ██╗   ██╗██████╗ ███████╗ ██████╗ ██████╗     ██╗  ██╗ █████╗  ██████╗██╗  ██╗███████╗██████╗
-██╔════╝██║   ██║██╔══██╗██╔════╝██╔═══██╗██╔══██╗    ██║  ██║██╔══██╗██╔════╝██║ ██╔╝██╔════╝██╔══██╗
-██║     ██║   ██║██████╔╝█████╗  ██║   ██║██████╔╝    ███████║███████║██║     █████╔╝ █████╗  ██████╔╝
-██║     ██║   ██║██╔══██╗██╔══╝  ██║   ██║██╔══██╗    ██╔══██║██╔══██║██║     ██╔═██╗ ██╔══╝  ██╔══██╗
-╚██████╗╚██████╔╝██║  ██║███████╗╚██████╔╝██║  ██║    ██║  ██║██║  ██║╚██████╗██║  ██╗███████╗██║  ██║
- ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝    ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
-```
+# Cursor Claw
 
-### **Cursor SDK Hacker · VENOM Edition**
+### **VENOM Edition**
 
-*Reverse-engineered ConnectRPC surface · `@cursor/sdk` harness · multi-agent swarm orchestration*
+*`@cursor/sdk` harness · ConnectRPC surface · Venom Swarm (`ca3`)*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-9cf?style=flat-square)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
@@ -21,9 +14,13 @@
 
 [Installation](#installation) · [Quickstart](#quickstart) · [Architecture](#architecture) · [Swarm workflows](#swarm-fork-plan-integrate-workflows) · [CLI reference](#cli-reference) · [Rate limiting](#rate-limiting--resilience) · [Crash recovery](#crash-recovery) · [Security model](#security-model) · [Benchmarks & tuning](#benchmarks--tuning)
 
+[Agents](AGENTS.md) · [Documentation index](docs/README.md)
+
 </div>
 
 ---
+
+> **Canon** · **Cursor Claw** ships as **`cursor-calw`** ([npm](https://www.npmjs.com/package/cursor-calw)) from [`kariemSeiam/cursor-calw`](https://github.com/kariemSeiam/cursor-calw). MIT licensed. Executable CLIs bind official [`@cursor/sdk`](https://www.npmjs.com/package/@cursor/sdk) — this repo exposes and documents what subscribers already pay for.
 
 ## Why this exists
 
@@ -40,7 +37,8 @@ This is **educational and operational** tooling for subscribers exploring an API
 ## Repository layout
 
 ```
-cursor-sdk-hacker/
+cursor-calw/
+├── AGENTS.md               # Orientation for autonomous agents & tooling
 ├── src/
 │   ├── ca.mjs              # Local SDK agent + REST (api.cursor.com)
 │   ├── ca2.mjs             # ConnectRPC + curl (api2.cursor.sh)
@@ -55,9 +53,18 @@ cursor-sdk-hacker/
 │       ├── integrator.mjs  # Merge + semantic integration agent
 │       └── reviewer.mjs    # Diffs, conflicts, merge order
 ├── docs/
+│   ├── README.md           # Documentation index + voice covenant
+│   ├── architecture.md
+│   ├── swarm-patterns.md
+│   ├── troubleshooting.md
 │   ├── REVERSE_ENGINEERING.md
 │   ├── API_REFERENCE.md
 │   └── METHODS_SCAN.md
+├── examples/               # Runnable scripts (see examples/README.md)
+├── test/
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── CODE_OF_CONDUCT.md
 ├── package.json
 ├── .env.example
 └── LICENSE
@@ -77,7 +84,7 @@ cursor-sdk-hacker/
 │         │                  │                      ▲                           │
 │         v                  v                      │ ca3 swarm / fork           │
 │  ┌─────────────────────────────────────────────────────────────────────────┐ │
-│  │                        Cursor SDK Hacker CLIs                          │ │
+│  │                        Cursor Claw CLIs                                  │ │
 │  │  ┌─────────────┐    ┌─────────────┐    ┌─────────────────────────────┐  │ │
 │  │  │ ca.mjs      │    │ ca2.mjs     │    │ ca3.mjs + lib/*.mjs         │  │ │
 │  │  │ SDK Agent   │    │ curl RPC    │    │ Orchestrator + ledger +     │  │ │
@@ -113,8 +120,8 @@ Auth trail (ConnectRPC path):
 **Requirements:** Node.js **18+**, `git`, `curl`, and a Cursor API key from [cursor.com/dashboard/integrations](https://cursor.com/dashboard/integrations).
 
 ```bash
-git clone https://github.com/kariemSeiam/cursor-sdk-hacker.git
-cd cursor-sdk-hacker
+git clone https://github.com/kariemSeiam/cursor-calw.git
+cd cursor-calw
 npm install
 ```
 
@@ -440,9 +447,15 @@ Record wall time, **USD usage** from `ca2 usage`, and qualitative diff size. Reg
 
 | Document | Contents |
 |----------|----------|
-| [docs/REVERSE_ENGINEERING.md](docs/REVERSE_ENGINEERING.md) | Full recon narrative |
-| [docs/API_REFERENCE.md](docs/API_REFERENCE.md) | Endpoint catalog |
-| [docs/METHODS_SCAN.md](docs/METHODS_SCAN.md) | Empirical method survey |
+| [AGENTS.md](AGENTS.md) | Entry path for Cursor / autonomous agents cloning this repo. |
+| [docs/README.md](docs/README.md) | Full documentation TOC + Markdown voice covenant (VENOM standard). |
+| [docs/architecture.md](docs/architecture.md) | Swarm internals, mermaid diagrams, SQLite vs ledger. |
+| [docs/swarm-patterns.md](docs/swarm-patterns.md) | Choosing `swarm` / `--plan` / `fork`, scaling cues. |
+| [docs/troubleshooting.md](docs/troubleshooting.md) | Symptoms → fixes for auth, rate limits, Git, ledger. |
+| [docs/REVERSE_ENGINEERING.md](docs/REVERSE_ENGINEERING.md) | `@cursor/sdk` bundle narrative and protocol recon. |
+| [docs/API_REFERENCE.md](docs/API_REFERENCE.md) | Curated endpoints + RPC tables. |
+| [docs/METHODS_SCAN.md](docs/METHODS_SCAN.md) | Empirical scan aggregations across services. |
+| [examples/README.md](examples/README.md) | Programmatic API examples mirrored from `ca3`. |
 
 ---
 
@@ -456,6 +469,6 @@ MIT — see [LICENSE](LICENSE). Copyright © 2026 Kariem Seiam (VENOM).
 
 **VENOM** · *Turning subscription dollars into sunlight on the wire.*
 
-[Report issues](https://github.com/kariemSeiam/cursor-sdk-hacker/issues) · [Upstream package](https://www.npmjs.com/package/@cursor/sdk)
+[Report issues](https://github.com/kariemSeiam/cursor-calw/issues) · [Upstream package](https://www.npmjs.com/package/@cursor/sdk)
 
 </div>

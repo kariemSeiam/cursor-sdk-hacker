@@ -1,6 +1,8 @@
-# Cursor API Reference
+# Cursor Claw · API reference appendix
 
-> Every endpoint we've discovered, tested, and documented.
+> **Canon** · Maintained with **Cursor Claw** [`cursor-calw`](https://github.com/kariemSeiam/cursor-calw) · MIT · cross-check live behavior with `ca2` before treating tables as gospel.
+
+**You are reading:** endpoint + ConnectRPC catalog — every path this repository has discovered, exercised, and written down.
 
 ## Authentication
 

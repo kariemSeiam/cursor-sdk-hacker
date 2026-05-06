@@ -1,7 +1,7 @@
 {
-  "name": "cursor-sdk-hacker",
+  "name": "cursor-calw",
   "version": "1.1.0",
-  "description": "VENOM's deep dive into Cursor's SDK — ConnectRPC reverse engineering, 96 models, 50+ RPC methods, full CLI tool.",
+  "description": "Cursor Claw (VENOM) — Cursor SDK harness, ConnectRPC recon, swarm CLIs: ca / ca2 / ca3.",
   "type": "module",
   "bin": {
     "ca": "./src/ca.mjs",
@@ -14,33 +14,42 @@
     "docs/"
   ],
   "scripts": {
-    "test": "echo \"Error: no tests yet\" && exit 1",
-    "postinstall": "echo '🐙 Run: npx ca help or npx ca2 help'"
+    "lint": "eslint .",
+    "test": "node --test \"test/*.test.mjs\"",
+    "postinstall": "echo '🦀 Cursor Claw — npx ca help | npx ca2 help | npx ca3 help'"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kariemSeiam/cursor-sdk-hacker.git"
+    "url": "git+https://github.com/kariemSeiam/cursor-calw.git"
   },
   "keywords": [
     "cursor",
     "cursor-ai",
+    "cursor-claw",
     "sdk",
     "cli",
     "connectrpc",
     "reverse-engineering",
     "ai-coding",
-    "agent"
+    "agent",
+    "swarm"
   ],
   "author": "Kariem Seiam <57973837+kariemSeiam@users.noreply.github.com>",
+  "engines": {
+    "node": ">=18"
+  },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kariemSeiam/cursor-sdk-hacker/issues"
+    "url": "https://github.com/kariemSeiam/cursor-calw/issues"
   },
-  "homepage": "https://github.com/kariemSeiam/cursor-sdk-hacker#readme",
+  "homepage": "https://github.com/kariemSeiam/cursor-calw#readme",
   "dependencies": {
-    "@cursor/sdk": "^1.0.9"
+    "@cursor/sdk": "^1.0.12"
   },
   "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "eslint": "^9.17.0",
+    "globals": "^15.14.0",
     "tsx": "^4.21.0"
   }
 }

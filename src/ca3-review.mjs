@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * ca3-review — Auto-diff and review of swarm agent outputs
+ * ca3-review — Cursor Claw · swarm output review / diff
  *
  * Usage:
  *   ca3-review                  — review all active swarm worktrees

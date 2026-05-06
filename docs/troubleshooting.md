@@ -1,6 +1,8 @@
-# Troubleshooting — Venom Swarm & Cursor tooling
+# Troubleshooting — Cursor Claw (Swarm, Git, API)
 
-Symptoms, likely causes, and recovery steps for **Swarm** (`ca3`), **Git worktrees**, **Cursor API / SDK** errors, and local **state** files.
+> **Canon** · **Cursor Claw** [`cursor-calw`](https://github.com/kariemSeiam/cursor-calw) · MIT · doc voice: [`docs/README.md`](./README.md#documentation-voice).
+
+**You are reading:** operator playbook — symptom → cause → fix for **Swarm** (`ca3`), **Git worktrees**, **Cursor API / SDK**, and local **state** files.
 
 ---
 
@@ -150,6 +152,7 @@ Swarm uses **`git worktree add --detach <path> <sha>`** so workers do not share 
 
 ## Where to read more
 
+- [docs/README.md](./README.md) — full documentation index + voice standard.
 - [architecture.md](./architecture.md) — data flow, worktree model, SQLite vs. ledger.
 - [swarm-patterns.md](./swarm-patterns.md) — mode selection and scaling.
-- [API_REFERENCE.md](./API_REFERENCE.md) — REST/ConnectRPC surfaces for broader diagnostics.
+- [API_REFERENCE.md](./API_REFERENCE.md) — REST / ConnectRPC surfaces for broader diagnostics.

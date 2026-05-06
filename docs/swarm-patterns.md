@@ -1,6 +1,10 @@
-# Swarm patterns — swarm vs. fork vs. plan
+# Swarm patterns — Cursor Claw (`ca3`)
 
-Venom Swarm exposes three main ways to parallelize **Cursor SDK** agents on a **Git** repo. This guide explains when each mode fits, how they interact with the **decomposer** and **ledger**, and how to scale runs without tripping limits.
+> **Canon** · **Cursor Claw** [`cursor-calw`](https://github.com/kariemSeiam/cursor-calw) · MIT · prose standard: [`Documentation voice`](./README.md#documentation-voice).
+
+**You are reading:** operator heuristics — when to run **simple swarm**, **`--plan`**, or **`fork`**, and how each mode hits the **ledger** + **rate limiter**.
+
+Venom Swarm exposes three main ways to parallelize [**`@cursor/sdk`**](https://www.npmjs.com/package/@cursor/sdk) agents across a **Git** repository. This guide frames mode selection, decomposition, and saturation control.
 
 ---
 
@@ -145,4 +149,4 @@ Do you already have explicit parallel specs?
 - **Plan** = let a **leader** partition the problem **before** parallel execution.
 - **Fork** = **you** partition the problem; the orchestrator only schedules it.
 
-For system design details, see [architecture.md](./architecture.md).
+For system design details, see [architecture.md](./architecture.md) and [docs/README.md](./README.md).

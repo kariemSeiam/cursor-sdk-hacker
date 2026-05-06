@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * ca-v2 — Cursor Agent CLI v2 (VENOM Edition) 🐙
+ * ca2 — Cursor Claw · ConnectRPC / curl (VENOM) 🦀
  * Full ConnectRPC access to Cursor's 250+ API methods
  * Uses curl under the hood to avoid Node.js rate limiting
  */
@@ -478,7 +478,7 @@ try {
     case 'privacy':    cmdPrivacy(args[1]); break;
     default:
       console.log(`
-🐙 ca-v2 — Cursor Agent CLI v2 (VENOM Edition)
+🦀 ca2 — Cursor Claw · ConnectRPC (VENOM)
 
 Usage: ca <command> [args]
 
