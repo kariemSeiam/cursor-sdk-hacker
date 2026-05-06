@@ -461,7 +461,7 @@ Record wall time, **USD usage** from `ca2 usage`, and qualitative diff size. Reg
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Copyright © 2026 Kariem Seiam (VENOM).
+MIT — see [LICENSE](LICENSE). Copyright © 2026 VENOM.
 
 ---
 
