@@ -2,7 +2,7 @@ import { mkdirSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
-const LEDGER_DIR = ".venom-swarm";
+const LEDGER_DIR = ".claw-swarm";
 
 /**
  * Create a disposable directory for a faux repo root with optional ledger JSON.

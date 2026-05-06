@@ -1,8 +1,8 @@
 # Cursor Claw · `examples/` index
 
-Runnable scripts calling the **same programmatic surfaces** Venom Swarm uses under `src/lib/*` (`SwarmOrchestrator`, ledger, decomposition, integration). Mirrors what you invoke from [`src/ca3.mjs`](../src/ca3.mjs).
+Runnable scripts calling the **same programmatic surfaces** as `ca3` under `src/lib/*` (`SwarmOrchestrator`, ledger, decomposition, integration).
 
-> **Canon** · **Cursor Claw** · npm [`cursor-calw`](https://www.npmjs.com/package/cursor-calw) · repo [`cursor-calw`](https://github.com/kariemSeiam/cursor-calw) · MIT · **VENOM-maintained.**
+> **Canon** · **Cursor Claw** · npm [`cursor-calw`](https://www.npmjs.com/package/cursor-calw) · repo [`cursor-calw`](https://github.com/kariemSeiam/cursor-calw) · [pigo.dev](https://pigo.dev) · MIT.
 
 **You are reading:** runnable example catalog — programmatic API complements the root [README CLI tables](../README.md).
 
@@ -55,7 +55,7 @@ node examples/5-crash-recovery.mjs --keep-ledger
 | `2-fork-tasks.mjs` | `fork()` distinct specs per worker. |
 | `3-plan-decompose.mjs` | `swarmWithPlan()` leader JSON DAG (`decomposer.mjs`). |
 | `4-with-integrator.mjs` | `integrator` + `forceIntegrator` after dual successes (`integrator.mjs`). |
-| `5-crash-recovery.mjs` | Ledger read/write `.venom-swarm/ledger.json`, `resumeSwarm()` scaffolding. |
+| `5-crash-recovery.mjs` | Ledger read/write `.claw-swarm/ledger.json`, `resumeSwarm()` scaffolding. |
 
 ---
 

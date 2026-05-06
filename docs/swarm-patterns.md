@@ -4,7 +4,7 @@
 
 **You are reading:** operator heuristics — when to run **simple swarm**, **`--plan`**, or **`fork`**, and how each mode hits the **ledger** + **rate limiter**.
 
-Venom Swarm exposes three main ways to parallelize [**`@cursor/sdk`**](https://www.npmjs.com/package/@cursor/sdk) agents across a **Git** repository. This guide frames mode selection, decomposition, and saturation control.
+Cursor Claw (`ca3` swarm) exposes three main ways to parallelize [**`@cursor/sdk`**](https://www.npmjs.com/package/@cursor/sdk) agents across a **Git** repository. This guide frames mode selection, decomposition, and saturation control.
 
 ---
 
@@ -118,7 +118,7 @@ Do you already have explicit parallel specs?
 ### 3. Git hygiene
 
 - Commit or stash **clean** starting states when you care about deterministic diffs.
-- Run **`ca3 clean`** after crashes to drop orphaned worktrees under `$TMPDIR/venom-swarm`.
+- Run **`ca3 clean`** after crashes to drop orphaned worktrees under `$TMPDIR/claw-swarm`.
 
 ### 4. Integration path
 
@@ -137,7 +137,7 @@ Do you already have explicit parallel specs?
 | Dimension | Guidance |
 |-----------|----------|
 | **Workers per repo** | Stay within `MAX_WORKERS`; scale **sequential** swarm runs for unrelated work packages. |
-| **Many repositories** | Run separate `ca3` processes per clone; isolate **ledger** paths (each repo has its own `.venom-swarm/`). |
+| **Many repositories** | Run separate `ca3` processes per clone; isolate **ledger** paths (each repo has its own `.claw-swarm/`). |
 | **Large codebase** | Prefer **plan** or **fork** with **narrow `allowed_paths`** to reduce merge pain. |
 | **API quota** | More workers × more tool calls → watch billing and **rate limit** counters (`ca2 usage` in this project’s tooling). |
 

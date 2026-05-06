@@ -1,8 +1,8 @@
 # Cursor Claw · Documentation center
 
-Documentation for [`kariemSeiam/cursor-calw`](https://github.com/kariemSeiam/cursor-calw).
+Documentation for [`kariemSeiam/cursor-calw`](https://github.com/kariemSeiam/cursor-calw) · editorial [pigo.dev](https://pigo.dev) · web mirror [claws.pigo.dev/cursor](https://claws.pigo.dev/cursor).
 
-**You are here:** index of `/docs/*.md`. For runnable CLIs, start from the root [README.md](../README.md). For repository topology and agent entry, read [AGENTS.md](../AGENTS.md) and [.venom/CONTEXT.md](../.venom/CONTEXT.md).
+**You are here:** index of `/docs/*.md`. For runnable CLIs, start from the root [README.md](../README.md). For repository topology and agent entry, read [AGENTS.md](../AGENTS.md) and [`docs/architecture.md`](./architecture.md).
 
 ---
 
@@ -21,31 +21,29 @@ Documentation for [`kariemSeiam/cursor-calw`](https://github.com/kariemSeiam/cur
 
 ---
 
-## Documentation voice
+## Editorial covenant
 
-VENOM-maintained prose obeys the following everywhere (including README and Markdown under `.venom/`).
+Cursor Claw documentation follows this everywhere (including root `README.md`).
 
-1. **Pack line first** on substantive docs — a tight block naming *Cursor Claw*, repo/npm links, license (`MIT`).
-2. **You are reading** — one italic or short sentence declares doc scope before the first `#` subsection after intros.
-3. **Tables before bullet walls** whenever you compare CLI modes, endpoints, constants, errors, roles.
-4. **Single source of CLI truth:** root `README.md` owns command tables unless a doc drills into one subsystem (`ca3`-only internals → architecture + swarm-patterns).
-5. **Anchored paths:** cite files as `` `src/lib/swarm.mjs` `` relative to repo root so agents can `Read` reliably.
-6. **No fluff adjectives:** state behavior, prerequisites, caveats (“recovery scaffolding”), not hype.
-7. **Cross-links end sections:** sibling docs (“Where to read more”) kill orphan islands.
-8. **Emoji sparingly:** marketing band at top/bottom of README only; specs stay ASCII-clean.
+1. **Pack line first** on substantive docs — name *Cursor Claw*, repo + npm identifiers, license (`MIT`); link [pigo.dev](https://pigo.dev) and/or [claws.pigo.dev/cursor](https://claws.pigo.dev/cursor) when those surfaces own the voice.
+2. **You are reading** — one short sentence states scope before the first deep subsection.
+3. **Tables before bullet walls** for comparisons (CLI modes, endpoints, limits, errors, roles).
+4. **Single source for CLI tables:** root `README.md` unless a doc intentionally drills into one subsystem (`ca3` internals → architecture + swarm-patterns).
+5. **Anchored paths:** cite `` `src/lib/swarm.mjs` `` style paths from repo root so tools can open files deterministically.
+6. **Declarative tone:** behavior, prerequisites, caveats (“recovery scaffolding”) — not hype or persona fiction.
+7. **Cross-links** end sections where another doc owns the rest of the story.
+8. **Emoji:** README marketing band only; spec pages stay ASCII-first.
 
-Patches that introduce a second contradictory description of limits, JWT flow, or `npm test` wiring are **incorrect** unless README and CONTEXT migrate together.
+Patches that contradict `README.md`, `docs/architecture.md`, or live code without updating the affected docs are incomplete.
 
 ---
 
 ## For autonomous agents editing docs
 
-Before you rewrite prose:
-
 | Check | Action |
 |-------|--------|
-| CLI parity | Commands and flags stay aligned with `src/*.mjs` — inspect help strings if README looks stale. |
-| Version lines | **`ca3` banner** derives from root `package.json` — cite that, never a mythical hardcoded semver. |
-| Changelog impact | Behavioral changes touch [CHANGELOG.md](../CHANGELOG.md); doc-only typo fixes optionally skip. |
+| CLI parity | Match `src/*.mjs` help text and parsers — README tables first. |
+| Version strings | **`ca3`** banner semver comes from root **`package.json`** — never invent parallel version folklore. |
+| Changelog | User-visible behavior changes → [CHANGELOG.md](../CHANGELOG.md) `[Unreleased]` (doc-only typos optional). |
 
-When in doubt about intent, [.venom/MEMORY.md](../.venom/MEMORY.md) holds durable stewardship notes (not duplication of CONTEXT).
+Long-lived maintainer intent belongs in [CHANGELOG.md](../CHANGELOG.md) `[Unreleased]`, a focused `docs/*.md` section, or the PR — not orphan root-level scratch files.

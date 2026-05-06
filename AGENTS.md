@@ -1,52 +1,49 @@
-# AGENTS.md — How to work inside Cursor Claw
+# AGENTS.md — Working inside Cursor Claw
 
-This repository is optimized for **human operators** and **autonomous coding agents** (Cursor Agents, Codex-class tools, CI bots). Read this once per session before you mutate code or docs.
+This repository is optimized for **humans** and **coding agents** (Cursor Agents, CI bots, local harnesses). Read once per session before changing source or shipped Markdown.
 
 ## What this repo is
 
 | Concept | Detail |
 |---------|--------|
-| **Product** | **Cursor Claw** — CLIs (`ca`, `ca2`, `ca3`, `ca3-review`) on top of official [`@cursor/sdk`](https://www.npmjs.com/package/@cursor/sdk) plus ConnectRPC recon. |
-| **GitHub** | [`kariemSeiam/cursor-calw`](https://github.com/kariemSeiam/cursor-calw) (published npm name **`cursor-calw`** matches slug). |
-| **Ethics** | Tooling for **paying Cursor subscribers** exploring APIs they fund — not bypass, scraping-for-abuse, or credential sharing. Maintain that posture in edits. |
+| **Product** | **Cursor Claw** — CLIs `ca`, `ca2`, `ca3`, `ca3-review` on [`@cursor/sdk`](https://www.npmjs.com/package/@cursor/sdk) plus documented ConnectRPC recon. |
+| **Package / repo** | npm **`cursor-calw`** · GitHub [`kariemSeiam/cursor-calw`](https://github.com/kariemSeiam/cursor-calw) · editorial pointer [pigo.dev](https://pigo.dev). Long-form **`docs/`** in repo · public mirror [claws.pigo.dev/cursor](https://claws.pigo.dev/cursor). |
+| **Use posture** | For **paying Cursor subscribers** inspecting APIs they fund — not abuse tooling, credential sharing, or dark-pattern automation. |
 
-## Read order (do not invert)
+## Read order
 
-| Step | Artifact | Purpose |
-|------|-----------|---------|
-| 1 | [.venom/CONTEXT.md](.venom/CONTEXT.md) | Machine-stable map: paths, stacks, CLIs, gotchas — **minimal prose**. |
-| 2 | [docs/README.md](docs/README.md) | Human/agent doc index + **voice covenant** for every Markdown change. |
-| 3 | [README.md](README.md) | User-facing CLI reference, workflows, ops tables. |
-| 4 | Target deep doc (`docs/*.md`) or `examples/README.md` | Only after you know which subsystem you touch. |
+| Step | Path | Role |
+|------|------|------|
+| 1 | [docs/README.md](docs/README.md) | Doc index + **editorial covenant**. |
+| 2 | [README.md](README.md) | Operator CLI reference + repo layout. |
+| 3 | Target `docs/*.md` or [examples/README.md](examples/README.md) | Subsystem depth. |
 
-If `.venom/CONTEXT.md` conflicts with reality, **`CONTEXT wins only after it is corrected`** — patch the CONTEXT or open a contradiction note in [.venom/MEMORY.md](.venom/MEMORY.md), not orphaned comments scattered in six files.
+If orientation docs drift from code (especially [`docs/architecture.md`](docs/architecture.md)), **fix docs and code in the same change set**.
 
-## Directory contract
+## Layout contract
 
-| Area | Responsibility |
-|------|----------------|
-| `src/*.mjs` | Executable CLIs; keep shebang `node`. |
-| `src/lib/*.mjs` | Swarm orchestration primitives — edits here affect concurrency, ledger, merges. |
-| `test/*.test.mjs` | **`node:test`** suites; mocks live in `test/helpers/`. **Do not break `npm test`** without migrating tests. |
-| `docs/` | Long-form narrative + reference (`docs/README.md` is the TOC). |
-| `examples/` | Runnable scripts illustrating `src/lib/` — paired with [`examples/README.md`](examples/README.md). |
-| `.venom/` | VENOM session layer (**optional** clone-side); ignore for npm publish tarball. |
+| Path | Purpose |
+|------|---------|
+| `src/*.mjs` | Entry CLIs (`#!/usr/bin/env node`). |
+| `src/lib/*.mjs` | Swarm engine — concurrency, ledger, Git worktrees, merge helpers. |
+| `test/*.test.mjs` | `node:test`; helpers in `test/helpers/`. |
+| `docs/` | Long-form docs (`docs/README.md` is the spine). |
+| `examples/` | Runnable API demos — see `examples/README.md`. |
+| `.venom/` | Optional local agent workflow / standards (**gitignored**); **not** published on npm. |
 
-## Commands you must green before a PR-worthy diff
+## Quality gate
 
 ```bash
 npm run lint
 npm test
 ```
 
-If you bump CLI semantics, **`README.md`** and any affected **`docs/*`** sections change in the **same PR**.
+CLI behavior changes ship with matching **`README.md`** + **`docs/*`** updates in one PR.
 
-## Operational guardrails
+## Guardrails
 
-- **Secrets:** Never commit keys. CLIs honor `CURSOR_API_KEY` and `~/.cursor-api-key` — see README. `.env.example` lists variable names only.
-- **Rate limits:** Swarm retries 429 / 464 / transient 5xx; do not strip backoff without benchmarking.
-- **Resume / ledger:** `resumeSwarm` is **recovery scaffolding** — describe behavior honestly; avoid promising full automatic replay unless the code does it.
+- **Secrets:** never commit keys; use `CURSOR_API_KEY` / `~/.cursor-api-key` (see README).
+- **Rate limits:** respect backoff / stagger — measure before weakening retries.
+- **Resume:** treat `resumeSwarm` as **scaffolding** until code guarantees full replay; document honestly.
 
-## Tone for doc patches
-
-Follow **[docs/README.md → Documentation voice](docs/README.md#documentation-voice)**. Tables beat rambling bullets; linking beats duplicating prose from README into four files.
+Doc tone: **[docs/README.md — Editorial covenant](docs/README.md#editorial-covenant)**.

@@ -1,7 +1,7 @@
 {
   "name": "cursor-calw",
   "version": "1.1.0",
-  "description": "Cursor Claw (VENOM) — Cursor SDK harness, ConnectRPC recon, swarm CLIs: ca / ca2 / ca3.",
+  "description": "Cursor Claw — Cursor SDK harness, ConnectRPC recon, swarm CLIs: ca / ca2 / ca3.",
   "type": "module",
   "bin": {
     "ca": "./src/ca.mjs",
@@ -25,6 +25,7 @@
   "keywords": [
     "cursor",
     "cursor-ai",
+    "cursor-calw",
     "cursor-claw",
     "sdk",
     "cli",
@@ -34,7 +35,7 @@
     "agent",
     "swarm"
   ],
-  "author": "VENOM <57973837+kariemSeiam@users.noreply.github.com>",
+  "author": "Cursor Claw (https://pigo.dev)",
   "engines": {
     "node": ">=18"
   },
@@ -42,7 +43,7 @@
   "bugs": {
     "url": "https://github.com/kariemSeiam/cursor-calw/issues"
   },
-  "homepage": "https://github.com/kariemSeiam/cursor-calw#readme",
+  "homepage": "https://claws.pigo.dev/cursor",
   "dependencies": {
     "@cursor/sdk": "^1.0.12"
   },

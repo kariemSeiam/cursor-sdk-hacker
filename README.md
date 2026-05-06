@@ -2,9 +2,11 @@
 
 # Cursor Claw
 
-### **VENOM Edition**
+### **SDK harness · ConnectRPC · multi-agent swarm**
 
-*`@cursor/sdk` harness · ConnectRPC surface · Venom Swarm (`ca3`)*
+*`ca` / `ca2` / `ca3` on [`@cursor/sdk`](https://www.npmjs.com/package/@cursor/sdk) — audited surfaces you can script.*
+
+Maintained from **[pigo.dev](https://pigo.dev)** · web docs **[claws.pigo.dev/cursor](https://claws.pigo.dev/cursor)** · sources **[cursor-calw](https://github.com/kariemSeiam/cursor-calw)** on GitHub.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-9cf?style=flat-square)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
@@ -20,7 +22,7 @@
 
 ---
 
-> **Canon** · **Cursor Claw** ships as **`cursor-calw`** ([npm](https://www.npmjs.com/package/cursor-calw)) from [`kariemSeiam/cursor-calw`](https://github.com/kariemSeiam/cursor-calw). MIT licensed. Executable CLIs bind official [`@cursor/sdk`](https://www.npmjs.com/package/@cursor/sdk) — this repo exposes and documents what subscribers already pay for.
+> **Canon** · **Cursor Claw** ships as **`cursor-calw`** ([npm](https://www.npmjs.com/package/cursor-calw)); repo [`kariemSeiam/cursor-calw`](https://github.com/kariemSeiam/cursor-calw); editorial [pigo.dev](https://pigo.dev); long-form docs also at [claws.pigo.dev/cursor](https://claws.pigo.dev/cursor). MIT. CLIs bind official [`@cursor/sdk`](https://www.npmjs.com/package/@cursor/sdk) — subscribers exploring APIs they already fund.
 
 ## Why this exists
 
@@ -42,18 +44,18 @@ cursor-calw/
 ├── src/
 │   ├── ca.mjs              # Local SDK agent + REST (api.cursor.com)
 │   ├── ca2.mjs             # ConnectRPC + curl (api2.cursor.sh)
-│   ├── ca3.mjs             # Venom Swarm orchestrator (parallel agents)
+│   ├── ca3.mjs             # Multi-agent swarm orchestrator (parallel agents)
 │   ├── ca3-review.mjs      # Standalone diff/review helper
 │   └── lib/
 │       ├── swarm.mjs       # Orchestration, ledger hooks, integrator stage
 │       ├── rate-limiter.mjs# Retries, backoff, batch staggering
-│       ├── ledger.mjs      # Persistent swarm task state (.venom-swarm/)
+│       ├── ledger.mjs      # Persistent swarm task state (.claw-swarm/)
 │       ├── worktrees.mjs   # Git worktree lifecycle
 │       ├── decomposer.mjs  # Planner / task decomposition
 │       ├── integrator.mjs  # Merge + semantic integration agent
 │       └── reviewer.mjs    # Diffs, conflicts, merge order
 ├── docs/
-│   ├── README.md           # Documentation index + voice covenant
+│   ├── README.md           # Documentation index + editorial covenant
 │   ├── architecture.md
 │   ├── swarm-patterns.md
 │   ├── troubleshooting.md
@@ -78,7 +80,7 @@ cursor-calw/
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                           YOUR ENVIRONMENT                                   │
 │  ┌──────────────┐   ┌──────────────┐   ┌──────────────────────────────────┐ │
-│  │   ~/.cursor  │   │   git repo   │   │  $TMPDIR/venom-swarm/            │ │
+│  │   ~/.cursor  │   │   git repo   │   │  $TMPDIR/claw-swarm/            │ │
 │  │ -api-key     │   │  (worktrees) │   │  isolated agent worktrees        │ │
 │  └──────┬───────┘   └──────┬───────┘   └──────────────────────────────────┘ │
 │         │                  │                      ▲                           │
@@ -254,7 +256,7 @@ Note: `ca2 ask` / `ca2 stream` concatenate every token after the subcommand into
 
 ---
 
-### `ca3` — Venom Swarm (`src/ca3.mjs`)
+### `ca3` — multi-agent swarm (`src/ca3.mjs`)
 
 | Command | Description |
 |---------|-------------|
@@ -354,7 +356,7 @@ Optional second tier that merges semantically:
 - Pass `--integrator` on `swarm` / `fork`, **or**
 - Run `ca3 integrate` after a run **if** worktree paths are available to the tool (see ledger / `--no-cleanup` and `git worktree list` when debugging).
 
-The integrator builds a dedicated worktree under `.venom-swarm/integration-<timestamp>`, applies non-conflicting patches, and may invoke an agent for conflict resolution when needed.
+The integrator builds a dedicated worktree under `.claw-swarm/integration-<timestamp>`, applies non-conflicting patches, and may invoke an agent for conflict resolution when needed.
 
 ---
 
@@ -395,13 +397,13 @@ The integrator builds a dedicated worktree under `.venom-swarm/integration-<time
 
 | Mechanism | Location | Role |
 |-----------|----------|------|
-| **Ledger** | `<repo>/.venom-swarm/ledger.json` | Persists swarm id, task text, per-task status, attempts, worktree paths |
+| **Ledger** | `<repo>/.claw-swarm/ledger.json` | Persists swarm id, task text, per-task status, attempts, worktree paths |
 | **Swarm state** | `<project>/.tmp-cli/swarm-state.json` | Lightweight session metadata (used by CLI `status` / `kill`) |
 | **`ca3 resume`** | API | Reloads ledger-oriented orchestration state |
 
 **Operational guidance**
 
-1. If a run dies mid-flight, inspect `.venom-swarm/ledger.json` for **queued / failed / running** tasks and associated `worktreePath` entries.
+1. If a run dies mid-flight, inspect `.claw-swarm/ledger.json` for **queued / failed / running** tasks and associated `worktreePath` entries.
 2. Use `ca3 clean` to garbage-collect **orphaned** worktrees (see `cleanupOrphanedWorktrees`).
 3. **`resumeSwarm` is still evolving** (checkpoint + ledger exist; full automatic replay may require following repo issues / PRs). Treat resume as **recovery scaffolding**, not a guarantee of hands-free continuation until your checkout matches mainline behavior.
 
@@ -415,7 +417,7 @@ The integrator builds a dedicated worktree under `.venom-swarm/integration-<time
 | **Transport** | HTTPS to Cursor endpoints; JWT short-lived for `api2`. |
 | **Ghost / privacy** | `ca2` sends `x-ghost-mode: true` on RPC by default—aligns with “no training” stance; use `ca2 privacy` for account-level policy. |
 | **Local execution** | `ca` / `ca3` run the SDK with **`local.cwd`** pointing at your tree or isolated worktrees—agents can edit files and run tools per Cursor’s model policy. |
-| **Isolation** | Swarm uses **detached git worktrees** under `$TMPDIR/venom-swarm/` so parallel experiments do not corrupt your main working tree until you merge intentionally. |
+| **Isolation** | Swarm uses **detached git worktrees** under `$TMPDIR/claw-swarm/` so parallel experiments do not corrupt your main working tree until you merge intentionally. |
 | **Supply chain** | `npm install` pins `@cursor/sdk`; audit upgrades consciously. |
 
 ---
@@ -448,7 +450,7 @@ Record wall time, **USD usage** from `ca2 usage`, and qualitative diff size. Reg
 | Document | Contents |
 |----------|----------|
 | [AGENTS.md](AGENTS.md) | Entry path for Cursor / autonomous agents cloning this repo. |
-| [docs/README.md](docs/README.md) | Full documentation TOC + Markdown voice covenant (VENOM standard). |
+| [docs/README.md](docs/README.md) | Documentation TOC + editorial covenant (tables-first, anchored paths). |
 | [docs/architecture.md](docs/architecture.md) | Swarm internals, mermaid diagrams, SQLite vs ledger. |
 | [docs/swarm-patterns.md](docs/swarm-patterns.md) | Choosing `swarm` / `--plan` / `fork`, scaling cues. |
 | [docs/troubleshooting.md](docs/troubleshooting.md) | Symptoms → fixes for auth, rate limits, Git, ledger. |
@@ -461,14 +463,14 @@ Record wall time, **USD usage** from `ca2 usage`, and qualitative diff size. Reg
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Copyright © 2026 VENOM.
+MIT — see [LICENSE](LICENSE). © 2026 Cursor Claw · [pigo.dev](https://pigo.dev).
 
 ---
 
 <div align="center">
 
-**VENOM** · *Turning subscription dollars into sunlight on the wire.*
+**Cursor Claw** · *CLI-native rigor for Cursor power users.*
 
-[Report issues](https://github.com/kariemSeiam/cursor-calw/issues) · [Upstream package](https://www.npmjs.com/package/@cursor/sdk)
+[Report issues](https://github.com/kariemSeiam/cursor-calw/issues) · [Upstream `@cursor/sdk`](https://www.npmjs.com/package/@cursor/sdk)
 
 </div>

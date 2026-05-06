@@ -10,8 +10,8 @@
 
 1. **Git:** `git rev-parse --show-toplevel` succeeds from your project (Swarm requires a repo).
 2. **Key:** `CURSOR_API_KEY` set, or readable `~/.cursor-api-key` (see `ca` / `ca3` key resolution).
-3. **Disk:** Enough space for OS temp worktrees under `$TMPDIR/venom-swarm`.
-4. **State:** If behavior is weird after a crash, check `.venom-swarm/ledger.json` and `.tmp-cli/swarm-state.json`.
+3. **Disk:** Enough space for OS temp worktrees under `$TMPDIR/claw-swarm`.
+4. **State:** If behavior is weird after a crash, check `.claw-swarm/ledger.json` and `.tmp-cli/swarm-state.json`.
 
 ---
 
@@ -58,7 +58,7 @@
 **Mitigation:**
 
 - Re-run with **`--workers 1`** to get a deterministic trace.
-- Inspect **`ca3` stderr** and ledger task **`error`** / **`result`** fields in `.venom-swarm/ledger.json`.
+- Inspect **`ca3` stderr** and ledger task **`error`** / **`result`** fields in `.claw-swarm/ledger.json`.
 
 ---
 
@@ -81,7 +81,7 @@ Swarm resolves the repo with `git rev-parse --show-toplevel`.
 
 - Run `git worktree list` and remove stale entries if needed.
 - Ensure **write access** to `$TMPDIR` and the main `.git` directory.
-- Retry after `ca3 clean` (removes Swarm worktrees under the Venom temp prefix).
+- Retry after `ca3 clean` (removes swarm temp trees under the **`claw-swarm`** prefix).
 
 ### Detached HEAD confusion
 
@@ -91,7 +91,7 @@ Swarm uses **`git worktree add --detach <path> <sha>`** so workers do not share 
 
 ### Orphan worktrees filling disk
 
-**Symptoms:** Old directories under **`/tmp/.../venom-swarm`** (or `$TMPDIR`) after crashes.
+**Symptoms:** Old directories under **`/tmp/.../claw-swarm`** (or `$TMPDIR`) after crashes.
 
 **Fix:**
 
@@ -111,12 +111,12 @@ Swarm uses **`git worktree add --detach <path> <sha>`** so workers do not share 
 
 ## Swarm-specific state & recovery
 
-### `.venom-swarm/ledger.json`
+### `.claw-swarm/ledger.json`
 
 - Written by **`Ledger`** (`ledger.mjs`).
 - Intended for **crash recovery** and task bookkeeping (status per index, worktree paths, timestamps).
 
-**If corrupt:** Delete the `.venom-swarm` directory only if you accept **loss of recovery metadata**; next run creates a fresh ledger.
+**If corrupt:** Delete the `.claw-swarm` directory only if you accept **loss of recovery metadata**; next run creates a fresh ledger.
 
 ### `.tmp-cli/swarm-state.json`
 
@@ -137,7 +137,7 @@ Swarm uses **`git worktree add --detach <path> <sha>`** so workers do not share 
 
 **Mitigation:**
 
-- This store is **managed by the SDK**, not Venom Swarm. Ensure **disk space** and consider **Cursor / SDK** upgrades if behavior changes.
+- This store is **managed by the SDK**, not Cursor Claw. Ensure **disk space** and consider **Cursor / SDK** upgrades if behavior changes.
 - Do not delete SQLite files while agents are running.
 
 ---

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * ca3 — Cursor Claw · Venom Swarm 🦀
+ * ca3 — Cursor Claw · multi-agent swarm
  * Multi-agent parallel orchestration via @cursor/sdk
  *
  * Usage:
@@ -44,7 +44,7 @@ const log = m => console.log(m);
 const ok = m => console.log(`${c.grn}✔${c.r} ${m}`);
 const fail = m => { console.error(`${c.red}✖${c.r} ${m}`); process.exit(1); };
 const warn = m => console.log(`${c.yel}⚠${c.r} ${m}`);
-const swarm_ = m => console.log(`${c.mag}🐙${c.r} ${m}`);
+const swarm_ = m => console.log(`${c.mag}🦀${c.r} ${m}`);
 const info = m => console.log(`${c.dim}ℹ${c.r} ${m}`);
 
 // ─── State ─────────────────────────────────────────────────
@@ -71,7 +71,7 @@ async function cmdSwarm(args) {
 
   if (!task) fail("Usage: ca3 swarm <task description>");
 
-  swarm_(`${c.bold}VENOM SWARM${c.r} v${VERSION}`);
+  swarm_(`${c.bold}Cursor Claw · swarm${c.r} v${VERSION}`);
 
   const repo = getRepoRoot();
   if (!repo) fail("Not in a git repository");
@@ -137,7 +137,7 @@ async function cmdFork(args) {
 
   if (!specs || specs.length === 0) fail("Usage: ca3 fork <spec1> <spec2> ...");
 
-  swarm_(`${c.bold}VENOM FORK${c.r} v${VERSION}`);
+  swarm_(`${c.bold}Cursor Claw · fork${c.r} v${VERSION}`);
 
   const repo = getRepoRoot();
   if (!repo) fail("Not in a git repository");
@@ -183,7 +183,7 @@ async function cmdPlan(args) {
   const task = args.join(" ");
   if (!task) fail("Usage: ca3 plan <task description>");
 
-  swarm_(`${c.bold}VENOM PLAN${c.r} v${VERSION}`);
+  swarm_(`${c.bold}Cursor Claw · plan${c.r} v${VERSION}`);
 
   const repo = getRepoRoot();
   if (!repo) fail("Not in a git repository");
@@ -235,7 +235,7 @@ async function cmdResume(args) {
   const repo = getRepoRoot();
   if (!repo) fail("Not in a git repository");
 
-  swarm_(`${c.bold}VENOM RESUME${c.r} v${VERSION}`);
+  swarm_(`${c.bold}Cursor Claw · resume${c.r} v${VERSION}`);
 
   try {
     const result = await resumeSwarm({ repo, model: parsed.model });
@@ -367,7 +367,7 @@ async function cmdIntegrate(args) {
   const worktrees = state?.worktrees || [];
   if (worktrees.length === 0) fail("No active swarm worktrees found");
 
-  swarm_(`${c.bold}VENOM INTEGRATE${c.r} v${VERSION}`);
+  swarm_(`${c.bold}Cursor Claw · integrate${c.r} v${VERSION}`);
 
   const result = await integrateResults({
     repo,
@@ -512,7 +512,7 @@ function parseArgs(args, command = "") {
 
 function help() {
   log(`
-${c.mag}🐙 VENOM SWARM${c.r} ${c.dim}v${VERSION}${c.r}
+${c.mag}🦀 Cursor Claw · swarm${c.r} ${c.dim}v${VERSION}${c.r}
 
 ${c.bold}Commands:${c.r}
   ${c.cyn}swarm${c.r} <task> [--plan] [--workers N] [--model X]

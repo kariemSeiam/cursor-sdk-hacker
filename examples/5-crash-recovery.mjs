@@ -3,7 +3,7 @@
  * Example 5 — Crash recovery: persistent ledger + resume entry point
  *
  * Demonstrates:
- * - Ledger (ledger.mjs): swarm state persisted under <repo>/.venom-swarm/ledger.json
+ * - Ledger (ledger.mjs): swarm state persisted under <repo>/.claw-swarm/ledger.json
  * - loadLedger(repo): reload state after a crash or new process
  * - resumeSwarm(options): loads ledger, reconstructs orchestrator metadata (see swarm.mjs — full
  *   agent replay for failed tasks is marked TODO in upstream code)
@@ -76,7 +76,7 @@ async function demoSyntheticLedger(repo) {
   if (!keepLedger) {
     loaded.delete();
     console.log(
-      "\nRemoved demo .venom-swarm/ ledger (pass --keep-ledger to leave it on disk for inspection)."
+      "\nRemoved demo .claw-swarm/ ledger (pass --keep-ledger to leave it on disk for inspection)."
     );
   } else {
     console.log("\nKept ledger on disk (--keep-ledger). Path:", loaded.file);

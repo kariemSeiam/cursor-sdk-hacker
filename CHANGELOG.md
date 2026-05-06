@@ -8,18 +8,20 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- **Repo hygiene:** dropped optional clone-local CONTEXT/MEMORY subtree; orientation is **`AGENTS.md`**, **`docs/README.md`**, **`docs/architecture.md`**.
+- **Breaking paths:** Swarm ledger **`/.claw-swarm/`** and temp worktrees **`$TMPDIR/claw-swarm/`** are canonical again. Any clone that used interim alternate directory prefixes should rename those trees or delete them before the next swarm run.
 - Documentation spine for agents & humans: **`AGENTS.md`**, **[`docs/README.md`](docs/README.md)** (catalog + Markdown voice covenant); refreshed **CONTRIBUTING**, **CODE_OF_CONDUCT**, **examples/README**, and canonical headers on **`docs/*.md`**.
 - Project **renamed to Cursor Claw**; GitHub repository: [kariemSeiam/cursor-calw](https://github.com/kariemSeiam/cursor-calw). npm package **`cursor-calw`** (slug matches repo).
 
 ### Added
 
-- **Venom Swarm** multi-agent orchestration (`ca3`, `ca3-review`): `swarm`, `fork`, `plan`, `resume`, `status`, `kill`, `clean`, `review`, `merge`, `integrate`, and model listing.
+- **Multi-agent swarm** (`ca3`, `ca3-review`): `swarm`, `fork`, `plan`, `resume`, `status`, `kill`, `clean`, `review`, `merge`, `integrate`, and model listing.
 - Documentation: `docs/architecture.md`, `docs/swarm-patterns.md`, `docs/troubleshooting.md`, and this changelog.
 
 ### Technical
 
-- Git **detached worktrees** under `$TMPDIR/venom-swarm` for worker isolation.
-- JSON **ledger** at `.venom-swarm/ledger.json` for run state and recovery-oriented metadata.
+- Git **detached worktrees** under `$TMPDIR/claw-swarm` for worker isolation.
+- JSON **ledger** at `.claw-swarm/ledger.json` for run state and recovery-oriented metadata.
 - **Plan mode**: leader-based task decomposition (`decomposer.mjs`) with JSON DAG validation.
 - **Rate limiting**: staggered worker batches and retry/backoff (`rate-limiter.mjs`) for 429/464 and transient network errors.
 - Optional **integrator** merge path (`integrator.mjs`) and **reviewer** overlap analysis (`reviewer.mjs`).

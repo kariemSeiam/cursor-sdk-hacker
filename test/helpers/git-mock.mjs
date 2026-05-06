@@ -4,7 +4,7 @@ import { basename, join } from "node:path";
 import { tmpdir } from "node:os";
 
 const require = createRequire(import.meta.url);
-export const MOCK_WORKTREE_BASE = join(tmpdir(), "venom-swarm");
+export const MOCK_WORKTREE_BASE = join(tmpdir(), "claw-swarm");
 
 /**
  * Replace `execSync` on the underlying CJS facet of node:child_process so ESM importers observe it.

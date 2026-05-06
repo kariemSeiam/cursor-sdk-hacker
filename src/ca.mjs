@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * ca — Cursor Claw · local SDK + REST (VENOM) 🦀
+ * ca — Cursor Claw · local SDK + REST
  * Local SDK execution (composer-2) + REST API (api.cursor.com)
  *
  * Model system (SDK v1.0.9+):
@@ -34,7 +34,7 @@ const c = {
 const log = m => console.log(m);
 const ok = m => console.log(`${c.grn}✔${c.r} ${m}`);
 const fail = m => { console.log(`${c.red}✖${c.r} ${m}`); process.exit(1); };
-const octo = m => console.log(`${c.mag}🐙${c.r} ${m}`);
+const clawMsg = m => console.log(`${c.mag}🦀${c.r} ${m}`);
 
 function getKey() {
   if (process.env.CURSOR_API_KEY) return process.env.CURSOR_API_KEY;
@@ -98,7 +98,7 @@ function localAsk(prompt, cwd, model) {
 async function main() {
   const agent = await Agent.create({
     apiKey: "${apiKey}",
-    name: "VENOM CLI",
+    name: "Cursor Claw CLI",
     model: ${modelJson},
     local: { cwd: "${safeCwd}" }
   });
@@ -184,8 +184,8 @@ main().catch(e => { process.stdout.write(JSON.stringify({t:"err",m:e.message})+"
 async function cmdAsk(args, model) {
   const text = args.join(" ");
   if (!text) fail("Usage: ca ask <your question>");
-  octo(`Model: ${c.bold}${modelLabel(model)}${c.r} | CWD: ${process.cwd()}`);
-  octo(`Asking: "${text.slice(0, 80)}${text.length > 80 ? "..." : ""}"\n`);
+  clawMsg(`Model: ${c.bold}${modelLabel(model)}${c.r} | CWD: ${process.cwd()}`);
+  clawMsg(`Asking: "${text.slice(0, 80)}${text.length > 80 ? "..." : ""}"\n`);
   await localAsk(text, undefined, model);
 }
 
@@ -193,19 +193,19 @@ async function cmdCode(args, model) {
   const text = args.join(" ");
   if (!text) fail("Usage: ca code <task description>");
   const cwd = process.cwd();
-  octo(`Model: ${c.bold}${modelLabel(model)}${c.r} | CWD: ${cwd}`);
-  octo(`Task: "${text.slice(0, 80)}${text.length > 80 ? "..." : ""}"\n`);
+  clawMsg(`Model: ${c.bold}${modelLabel(model)}${c.r} | CWD: ${cwd}`);
+  clawMsg(`Task: "${text.slice(0, 80)}${text.length > 80 ? "..." : ""}"\n`);
   await localAsk(text, cwd, model);
 }
 
 async function cmdMe() {
-  octo("Account info...");
+  clawMsg("Account info...");
   const d = await restApi("GET", "/v1/me");
   console.log(JSON.stringify(d, null, 2));
 }
 
 async function cmdModels() {
-  octo("Fetching models...");
+  clawMsg("Fetching models...");
   const d = await restApi("GET", "/v1/models");
   if (d.items?.length) {
     log(`\n${c.bold}Cloud Models (REST API):${c.r}`);
@@ -222,14 +222,14 @@ async function cmdModels() {
 }
 
 async function cmdRepos() {
-  octo("Fetching repos...");
+  clawMsg("Fetching repos...");
   const d = await restApi("GET", "/v1/repositories");
   console.log(JSON.stringify(d, null, 2));
 }
 
 async function cmdAgents(args) {
   const limit = args[0] || "20";
-  octo("Fetching agents...");
+  clawMsg("Fetching agents...");
   const d = await restApi("GET", `/v1/agents?limit=${limit}&includeArchived=true`);
   if (d.items?.length) {
     log(`\n${c.bold}Agents:${c.r}`);
@@ -244,7 +244,7 @@ async function cmdAgents(args) {
 async function cmdPrompt(args, model) {
   const text = args.join(" ");
   if (!text) fail("Usage: ca prompt <text>");
-  octo(`Cloud prompt [${modelLabel(model)}]...`);
+  clawMsg(`Cloud prompt [${modelLabel(model)}]...`);
   const res = await restApi("POST", "/v1/agents", {
     prompt: { text }, model: { id: model.id },
   });
@@ -258,7 +258,7 @@ async function cmdPrompt(args, model) {
 async function cmdRuns(args) {
   const agentId = args[0];
   if (!agentId) fail("Usage: ca runs <agentId>");
-  octo(`Runs for ${agentId}`);
+  clawMsg(`Runs for ${agentId}`);
   const d = await restApi("GET", `/v1/agents/${enc(agentId)}/runs?limit=20`);
   if (d.items?.length) {
     for (const r of d.items) {
@@ -307,13 +307,13 @@ async function streamRun(agentId, runId) {
 async function cmdStream(args) {
   const [agentId, runId] = args;
   if (!agentId || !runId) fail("Usage: ca stream <agentId> <runId>");
-  octo(`Streaming ${runId}...\n`);
+  clawMsg(`Streaming ${runId}...\n`);
   await streamRun(agentId, runId);
 }
 
 async function cmdDelete(args) {
   const id = args[0]; if (!id) fail("Usage: ca delete <agentId>");
-  octo(`Deleting ${id}...`);
+  clawMsg(`Deleting ${id}...`);
   await restApi("DELETE", `/v1/agents/${enc(id)}`);
   ok("Deleted!");
 }
@@ -322,7 +322,7 @@ async function cmdRaw(args) {
   const method = (args[0] || "GET").toUpperCase();
   const path = args[1]; const body = args[2] ? JSON.parse(args[2]) : null;
   if (!path) fail("Usage: ca raw <METHOD> <path> [json]");
-  octo(`${method} ${path}`);
+  clawMsg(`${method} ${path}`);
   const d = await restApi(method, path, body);
   console.log(JSON.stringify(d, null, 2));
 }
@@ -331,7 +331,7 @@ async function cmdRaw(args) {
 
 function help() {
   log(`
-${c.mag}🐙 CURSOR AGENT CLI${c.r} ${c.dim}v${VERSION} by VENOM${c.r}
+${c.mag}🦀 Cursor Claw · ca${c.r} ${c.dim}v${VERSION}${c.r}
 
 ${c.bold}Local (SDK — runs on your machine):${c.r}
   ${c.cyn}ask${c.r} <question>              Ask composer a question

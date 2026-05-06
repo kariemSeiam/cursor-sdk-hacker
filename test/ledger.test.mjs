@@ -125,8 +125,8 @@ describe("Ledger", () => {
   });
 
   test("loadLedger returns null when ledger.json is malformed", () => {
-    mkdirSync(join(sandbox.root, ".venom-swarm"), { recursive: true });
-    writeFileSync(join(sandbox.root, ".venom-swarm", "ledger.json"), corruptedLedgerBlob());
+    mkdirSync(join(sandbox.root, ".claw-swarm"), { recursive: true });
+    writeFileSync(join(sandbox.root, ".claw-swarm", "ledger.json"), corruptedLedgerBlob());
 
     assert.strictEqual(loadLedger(sandbox.root), null);
   });
@@ -137,7 +137,7 @@ describe("Ledger", () => {
     ledger.save();
     ledger.delete();
 
-    assert.strictEqual(existsSync(join(sandbox.root, ".venom-swarm")), false);
+    assert.strictEqual(existsSync(join(sandbox.root, ".claw-swarm")), false);
   });
 });
 

@@ -2,7 +2,7 @@
 
 **Cursor Claw** (`cursor-calw` on [npm](https://www.npmjs.com/package/cursor-calw), [`kariemSeiam/cursor-calw`](https://github.com/kariemSeiam/cursor-calw) on GitHub) exists because Cursor Pro+ subscribers deserve **inspectable machinery** — not folklore. Contributions that keep CLI behavior honest, documented, and test-backed are welcome.
 
-Before you draft prose patches, skim **[docs/README.md → Documentation voice](docs/README.md#documentation-voice)** — it is how VENOM keeps Markdown consistent across fourteen files without drift.
+Before you draft prose patches, read **[docs/README.md → Editorial covenant](docs/README.md#editorial-covenant)** — it keeps Markdown aligned across this repo.
 
 ---
 
@@ -51,9 +51,9 @@ New behavior warrants tests or a deliberate exception noted in PR description.
 | If you change… | Update also… |
 |----------------|--------------|
 | `ca` · `ca2` · `ca3` public flags or subcommands | [README.md](README.md) CLI tables |
-| Swarm internals, limits, filenames | [`docs/architecture.md`](docs/architecture.md) ± [`.venom/CONTEXT.md`](.venom/CONTEXT.md) |
+| Swarm internals, limits, filenames | [`docs/architecture.md`](docs/architecture.md) |
 | Operator playbook material | [`docs/swarm-patterns.md`](docs/swarm-patterns.md) or [`docs/troubleshooting.md`](docs/troubleshooting.md) |
-| RPC / HTTP catalog | [`docs/API_REFERENCE.md`](docs/API_REFERENCE.md) (and CONTEXT **only if** topology changes) |
+| RPC / HTTP catalog | [`docs/API_REFERENCE.md`](docs/API_REFERENCE.md) (and [`docs/architecture.md`](docs/architecture.md) if topology changes) |
 
 **Never** stash secrets — keys live in `CURSOR_API_KEY` / `~/.cursor-api-key` per [README](README.md) and [.env.example](.env.example).
 

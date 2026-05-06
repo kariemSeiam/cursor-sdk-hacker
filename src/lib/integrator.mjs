@@ -84,7 +84,7 @@ export async function integrateResults(options) {
   const conflicts = detectConflicts(worktrees.map(w => w.path));
 
   // Create integration worktree (detached HEAD to avoid conflicts)
-  const integrationPath = join(repo, `.venom-swarm/integration-${Date.now()}`);
+  const integrationPath = join(repo, `.claw-swarm/integration-${Date.now()}`);
   execSync(`git -C "${repo}" worktree add --detach "${integrationPath}" ${commitSha}`, { stdio: "pipe" });
 
   // Apply all non-conflicting changes

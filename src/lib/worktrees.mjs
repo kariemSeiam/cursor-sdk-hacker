@@ -14,7 +14,7 @@ import { tmpdir } from "node:os";
 import { execSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 
-const WORKTREE_BASE = join(tmpdir(), "venom-swarm");
+const WORKTREE_BASE = join(tmpdir(), "claw-swarm");
 
 export function ensureWorktreeBase() {
   if (!existsSync(WORKTREE_BASE)) {

@@ -19,7 +19,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync } from "node
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 
-const LEDGER_DIR = ".venom-swarm";
+const LEDGER_DIR = ".claw-swarm";
 const LEDGER_FILE = "ledger.json";
 
 export class Ledger {

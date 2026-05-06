@@ -68,11 +68,11 @@ describe("worktrees (mocked git)", { concurrency: false }, () => {
     assert.ok(removes.some(r => r.includes(firstPath)), "expected rollback remove for first successful add");
   });
 
-  test("listOrphanedWorktrees selects venom swarm tmp paths only", () => {
+  test("listOrphanedWorktrees selects claw swarm tmp paths only", () => {
     git.stubOrphanPorcelain(["orphan-z"]);
     const rows = mod.listOrphanedWorktrees("/repo/x");
     assert.strictEqual(rows.length, 1);
-    assert.ok(rows[0].includes("venom-swarm"));
+    assert.ok(rows[0].includes("claw-swarm"));
     assert.strictEqual(git.calls.some(c => c.includes("worktree list")), true);
   });
 

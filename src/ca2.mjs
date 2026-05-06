@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * ca2 — Cursor Claw · ConnectRPC / curl (VENOM) 🦀
+ * ca2 — Cursor Claw · ConnectRPC / curl
  * Full ConnectRPC access to Cursor's 250+ API methods
  * Uses curl under the hood to avoid Node.js rate limiting
  */
@@ -14,7 +14,7 @@ import { homedir } from 'os';
 const API2 = 'https://api2.cursor.sh';
 const REST = 'https://api.cursor.com';
 const KEY_FILE = process.env.CURSOR_KEY_FILE || `${homedir()}/.cursor-api-key`;
-const VERSION = '2.0.0-venom';
+const VERSION = '2.0.0';
 
 // ─── Auth ─────────────────────────────────────────────────
 let cachedToken = null;
@@ -181,7 +181,7 @@ function cmdModels() {
   const others = models.filter(m => !m.modelId.includes('composer') && !m.modelId.includes('codex') && !m.modelId.includes('claude') && !m.modelId.includes('gpt-5'));
 
   console.log(`
-🐙 Cursor Models (${models.length} total)
+🦀 Cursor Models (${models.length} total)
 ${'─'.repeat(50)}
 
 🧠 Composer (Cursor's own):
@@ -217,7 +217,7 @@ function cmdAccount() {
   const custom = user.custom;
 
   console.log(`
-🐙 Account Info
+🦀 Account Info
 ${'─'.repeat(50)}
 
 👤 Profile:
@@ -257,7 +257,7 @@ function cmdSkills() {
     m => rpc('aiserver.v1.DashboardService', m)
   );
   console.log(`
-🐙 Skills & Commands
+🦀 Skills & Commands
 ${'─'.repeat(50)}
 
 📋 Skills (${(skills.skills || []).length}):
@@ -275,7 +275,7 @@ function cmdExperiments() {
   const layers = Object.entries(config.layer_configs || {});
 
   console.log(`
-🐙 Active Experiments: ${active.length} | Layer Configs: ${layers.length}
+🦀 Active Experiments: ${active.length} | Layer Configs: ${layers.length}
 ${'─'.repeat(50)}
 ${active.slice(0, 15).map(([id, e]) => `   ✅ [${id}] ${e.group_name || e.rule_id}: ${JSON.stringify(e.value).slice(0, 80)}`).join('\n')}
 ${active.length > 15 ? `\n   ... and ${active.length - 15} more` : ''}
@@ -308,7 +308,7 @@ Examples:
 }
 
 function cmdScan() {
-  console.log('🐙 Scanning DashboardService methods...\n');
+  console.log('🦀 Scanning DashboardService methods...\n');
   const methods = [
     'GetCurrentBillingCycle','GetCurrentPeriodUsage','GetTokenUsage',
     'GetUsageLimitStatusAndActiveGrants','GetUserPrivacyMode','GetHardLimit',
@@ -349,9 +349,9 @@ function cmdScan() {
 }
 
 function cmdExplore() {
-  console.log('🐙 Probing hidden endpoints...\n');
+  console.log('🦀 Probing hidden endpoints...\n');
   const tests = [
-    ['agent.v1.AgentService', 'GetUserApiKeyAccess', { apiKeyName: 'venom' }],
+    ['agent.v1.AgentService', 'GetUserApiKeyAccess', { apiKeyName: 'cursor-calw' }],
     ['agent.v1.AgentService', 'GetCloudAgentPluginsSnapshot', {}],
     ['agent.v1.AgentService', 'GetMe', {}],
     ['agent.v1.AgentService', 'GetCopyStatus', {}],
@@ -385,7 +385,7 @@ function cmdExplore() {
 
 function cmdAsk(prompt, model) {
   model = model || 'composer-2-fast';
-  console.log(`🐙 ${model}: "${prompt}"\n`);
+  console.log(`🦀 ${model}: "${prompt}"\n`);
   const body = JSON.stringify({
     model,
     messages: [{ role: 'user', content: prompt }],
@@ -410,7 +410,7 @@ function cmdAsk(prompt, model) {
 
 function cmdStream(prompt, model) {
   model = model || 'composer-2-fast';
-  console.log(`🐙 Streaming ${model}: "${prompt}"\n`);
+  console.log(`🦀 Streaming ${model}: "${prompt}"\n`);
   const body = JSON.stringify({
     model,
     messages: [{ role: 'user', content: prompt }],
@@ -478,7 +478,7 @@ try {
     case 'privacy':    cmdPrivacy(args[1]); break;
     default:
       console.log(`
-🦀 ca2 — Cursor Claw · ConnectRPC (VENOM)
+🦀 ca2 — Cursor Claw · ConnectRPC
 
 Usage: ca <command> [args]
 

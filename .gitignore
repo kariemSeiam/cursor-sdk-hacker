@@ -2,7 +2,7 @@ node_modules/
 .env
 *.log
 .cursor/
-.DS_Store
+# Local VENOM agent standards / session files (not part of the published pack)
 
 # Temp CLI scripts (generated at runtime)
 .tmp-cli/
