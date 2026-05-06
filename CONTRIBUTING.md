@@ -1,6 +1,8 @@
-# Contributing to Cursor Claw
+# Contributing to **cursor-calw**
 
-**Cursor Claw** (`cursor-calw` on [npm](https://www.npmjs.com/package/cursor-calw), [`kariemSeiam/cursor-calw`](https://github.com/kariemSeiam/cursor-calw) on GitHub) exists because Cursor Pro+ subscribers deserve **inspectable machinery** — not folklore. Contributions that keep CLI behavior honest, documented, and test-backed are welcome.
+**Maintainer:** [kariemSeiam](https://github.com/kariemSeiam) · **kariemseiam@gmail.com**
+
+**cursor-calw** (Cursor Claw on [npm](https://www.npmjs.com/package/cursor-calw), repo [`kariemSeiam/cursor-calw`](https://github.com/kariemSeiam/cursor-calw)) is **solo-authored**. There is no “Cursor” contributor org here—just this maintainer. Issues and **small, focused PRs** are welcome if they match the project’s scope and quality bar.
 
 Before you draft prose patches, read **[docs/README.md → Editorial covenant](docs/README.md#editorial-covenant)** — it keeps Markdown aligned across this repo.
 
@@ -24,9 +26,9 @@ Before you draft prose patches, read **[docs/README.md → Editorial covenant](d
 
 ## Development workflow
 
-1. Fork **`cursor-calw`** → branch from **`main`**.
+1. Fork **`cursor-calw`** → branch from **`main`** (or work in a clone if you’re the maintainer).
 2. `npm ci` (CI uses the same lockfile discipline).
-3. Keep changes **narrow** unless a maintainer-approved refactor is in flight.
+3. Keep changes **narrow** unless **kariemSeiam** has agreed to a larger refactor.
 
 ---
 
@@ -42,7 +44,7 @@ npm test
 | `npm test` | `node:test` suites under [`test/`](test/). |
 | `npm run lint` | ESLint 9 (`eslint.config.js`). **Warnings allowed today** unless CI adopts `--max-warnings 0`. |
 
-New behavior warrants tests or a deliberate exception noted in PR description.
+New behavior warrants tests or a deliberate exception noted in the PR description.
 
 ---
 
@@ -61,15 +63,15 @@ New behavior warrants tests or a deliberate exception noted in PR description.
 
 ## Pull requests
 
-- Motivation paragraph + behavioural summary — reviewers should reconstruct intent without archaeology.
+- Short motivation + behavioral summary so intent is obvious.
 - `Fixes #nnn` hooks when applicable.
-- Release-facing changes logged under **[CHANGELOG.md](CHANGELOG.md) `[Unreleased]`**.
+- User-visible changes logged under **[CHANGELOG.md](CHANGELOG.md) `[Unreleased]`** when appropriate.
 
-Community tone: **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)**
+Conduct: **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)**
 
 ---
 
-## Releases (maintainers)
+## Releases (author)
 
 Tag-driven publish per [`.github/workflows/publish.yml`](.github/workflows/publish.yml): push **`v*`** tags after versioning `package.json` and consolidating **CHANGELOG**.
 

@@ -46,4 +46,4 @@ Patches that contradict `README.md`, `docs/architecture.md`, or live code withou
 | Version strings | **`ca3`** banner semver comes from root **`package.json`** — never invent parallel version folklore. |
 | Changelog | User-visible behavior changes → [CHANGELOG.md](../CHANGELOG.md) `[Unreleased]` (doc-only typos optional). |
 
-Long-lived maintainer intent belongs in [CHANGELOG.md](../CHANGELOG.md) `[Unreleased]`, a focused `docs/*.md` section, or the PR — not orphan root-level scratch files.
+Long-lived intent outside the changelog belongs in [CHANGELOG.md](../CHANGELOG.md) `[Unreleased]`, a focused `docs/*.md` section, or the PR — not orphan root-level scratch files.

@@ -1,39 +1,11 @@
-# Contributor Covenant · Cursor Claw
+# Code of conduct · **cursor-calw**
 
-This **Code of Conduct** applies to all spaces where **Cursor Claw** (`cursor-calw` / [`kariemSeiam/cursor-calw`](https://github.com/kariemSeiam/cursor-calw)) contributors interact — issues, discussions, patches, chats about the codebase.
+This document applies to **[kariemSeiam/cursor-calw](https://github.com/kariemSeiam/cursor-calw)** on GitHub — issues, discussions, and pull requests.
 
-The project ships transparent tooling tied to paid Cursor subscriptions; hostility, harassment, or power plays against other contributors defeats that purpose faster than buggy code ever could.
+The project is **solo-maintained** by **[kariemSeiam](https://github.com/kariemSeiam)**. It is **not** a “Cursor company” open-source program; there is no separate Cursor contributing body. Respectful, good-faith interaction with the maintainer and with anyone else who shows up here is required.
 
----
+Harassment, threats, stalking, bigotry, sexual attention, dumping credentials, or bad-faith spam will not be tolerated. Participants may be blocked or reported via GitHub.
 
-## Our pledge
+**Contact:** open a private avenue if GitHub provides one, or use [GitHub support](https://support.github.com/) for abuse on the platform. For routine project matters, use [Issues](https://github.com/kariemSeiam/cursor-calw/issues).
 
-We, as members, contributors, and leaders, pledge to make participation in our community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socioeconomic status, nationality, personal appearance, race, religion, or sexual identity and orientation.
-
----
-
-## Our standards
-
-Examples of behaviour that contributes to a positive environment include:
-
-- Showing empathy toward others.
-- Respectfully expressing differing viewpoints or experiences.
-- Accepting constructive feedback with grace.
-
-Examples of unacceptable behaviour include:
-
-- Sexual attention or remarks of any kind unwelcome by the recipient.
-- Trolling, insulting remarks, personal or political attacks, or harassment — public or private.
-- Sharing private information of others without clear permission.
-
----
-
-## Enforcement
-
-Participants who abuse these standards may be warned, temporarily moderated, or removed from project spaces.
-
-You may contact the repository maintainers if you observe conduct that lowers the tone of the discussion or threatens others’ wellbeing.
-
-Instances of abusive behaviour may also be reported to community platforms (for example GitHub support) according to their own policies.
-
-This code adapts themes from [Contributor Covenant 2.1](https://www.contributor-covenant.org/version/2/1/code_of_con/).
+This text is deliberately short (solo repo). Themes align with **[Contributor Covenant 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/)** for seriousness of intent.
